@@ -371,3 +371,4 @@ appsettings.Production.json
 appsettings.*.json
 !appsettings.Development.json
 !appsettings.json
+/obj/Debug/net10.0/refint/IntegrationTest.dll
