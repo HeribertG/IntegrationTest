@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Klacks.Api.Domain.Enums;
+using Klacks.Api.Domain.Models.Associations;
 using Klacks.Api.Domain.Models.Schedules;
 using Klacks.Api.Domain.Services.ShiftSchedule;
 using Klacks.Api.Infrastructure.Persistence;
@@ -51,15 +52,34 @@ public class GetShiftScheduleTests
 
     private async Task CleanupTestData()
     {
-        var testShifts = await _context.Shift
+        var testShiftIds = await _context.Shift
             .Where(s => s.Name.StartsWith("TEST_"))
+            .Select(s => s.Id)
             .ToListAsync();
 
-        if (testShifts.Count != 0)
+        if (testShiftIds.Count != 0)
         {
+            var shiftGroupItems = await _context.GroupItem
+                .Where(gi => gi.ShiftId.HasValue && testShiftIds.Contains(gi.ShiftId.Value))
+                .ToListAsync();
+            _context.GroupItem.RemoveRange(shiftGroupItems);
+
+            var testShifts = await _context.Shift
+                .Where(s => testShiftIds.Contains(s.Id))
+                .ToListAsync();
             _context.Shift.RemoveRange(testShifts);
-            await _context.SaveChangesAsync();
         }
+
+        var testGroups = await _context.Group
+            .Where(g => g.Name.StartsWith("TEST_GROUP_"))
+            .ToListAsync();
+
+        if (testGroups.Count != 0)
+        {
+            _context.Group.RemoveRange(testGroups);
+        }
+
+        await _context.SaveChangesAsync();
     }
 
     private async Task<Shift> CreateTestShift(
@@ -649,6 +669,243 @@ public class GetShiftScheduleTests
         if (daysUntilTarget == 0)
             daysUntilTarget = 7;
         return today.AddDays(daysUntilTarget);
+    }
+
+    private async Task<Group> CreateTestGroup(string name, Guid? parentId = null)
+    {
+        var group = new Group
+        {
+            Id = Guid.NewGuid(),
+            Name = $"TEST_GROUP_{name}",
+            Description = $"Test group {name}",
+            ValidFrom = DateTime.UtcNow.AddYears(-1),
+            Parent = parentId,
+            IsDeleted = false
+        };
+
+        await _context.Group.AddAsync(group);
+        await _context.SaveChangesAsync();
+        return group;
+    }
+
+    private async Task AssignShiftToGroup(Guid shiftId, Guid groupId)
+    {
+        var groupItem = new GroupItem
+        {
+            Id = Guid.NewGuid(),
+            ShiftId = shiftId,
+            GroupId = groupId,
+            ValidFrom = DateTime.UtcNow.AddYears(-1),
+            IsDeleted = false
+        };
+
+        await _context.GroupItem.AddAsync(groupItem);
+        await _context.SaveChangesAsync();
+    }
+
+    #endregion
+
+    #region Group Filter Tests
+
+    [Test]
+    public async Task GetShiftSchedule_WithGroupFilter_Should_Return_Shift_Without_Group()
+    {
+        // Arrange
+        var group = await CreateTestGroup("FilterTest1");
+        var shiftWithoutGroup = await CreateTestShift("NoGroupShift", isMonday: true);
+
+        var monday = GetNextWeekday(DayOfWeek.Monday);
+        var startDate = monday;
+        var endDate = monday;
+
+        // Act
+        var result = await _service.GetShiftScheduleAsync(
+            startDate,
+            endDate,
+            null,
+            group.Id);
+
+        // Assert
+        var shiftResults = result.Where(r => r.ShiftId == shiftWithoutGroup.Id).ToList();
+        shiftResults.Should().HaveCount(1, "Shifts without group should always be returned");
+    }
+
+    [Test]
+    public async Task GetShiftSchedule_WithGroupFilter_Should_Return_Shift_In_Selected_Group()
+    {
+        // Arrange
+        var group = await CreateTestGroup("FilterTest2");
+        var shiftInGroup = await CreateTestShift("InGroupShift", isMonday: true);
+        await AssignShiftToGroup(shiftInGroup.Id, group.Id);
+
+        var monday = GetNextWeekday(DayOfWeek.Monday);
+        var startDate = monday;
+        var endDate = monday;
+
+        // Act
+        var result = await _service.GetShiftScheduleAsync(
+            startDate,
+            endDate,
+            null,
+            group.Id);
+
+        // Assert
+        var shiftResults = result.Where(r => r.ShiftId == shiftInGroup.Id).ToList();
+        shiftResults.Should().HaveCount(1, "Shift in selected group should be returned");
+    }
+
+    [Test]
+    public async Task GetShiftSchedule_WithGroupFilter_Should_Not_Return_Shift_In_Different_Group()
+    {
+        // Arrange
+        var groupA = await CreateTestGroup("FilterTestA");
+        var groupB = await CreateTestGroup("FilterTestB");
+        var shiftInGroupA = await CreateTestShift("InGroupAShift", isMonday: true);
+        await AssignShiftToGroup(shiftInGroupA.Id, groupA.Id);
+
+        var monday = GetNextWeekday(DayOfWeek.Monday);
+        var startDate = monday;
+        var endDate = monday;
+
+        // Act
+        var result = await _service.GetShiftScheduleAsync(
+            startDate,
+            endDate,
+            null,
+            groupB.Id);
+
+        // Assert
+        var shiftResults = result.Where(r => r.ShiftId == shiftInGroupA.Id).ToList();
+        shiftResults.Should().BeEmpty("Shift in different group should not be returned");
+    }
+
+    [Test]
+    public async Task GetShiftSchedule_WithGroupFilter_Should_Return_Shift_In_Child_Group()
+    {
+        // Arrange
+        var parentGroup = await CreateTestGroup("ParentGroup");
+        var childGroup = await CreateTestGroup("ChildGroup", parentGroup.Id);
+        var shiftInChildGroup = await CreateTestShift("InChildGroupShift", isMonday: true);
+        await AssignShiftToGroup(shiftInChildGroup.Id, childGroup.Id);
+
+        var monday = GetNextWeekday(DayOfWeek.Monday);
+        var startDate = monday;
+        var endDate = monday;
+
+        // Act
+        var result = await _service.GetShiftScheduleAsync(
+            startDate,
+            endDate,
+            null,
+            parentGroup.Id);
+
+        // Assert
+        var shiftResults = result.Where(r => r.ShiftId == shiftInChildGroup.Id).ToList();
+        shiftResults.Should().HaveCount(1, "Shift in child group should be returned when parent is selected");
+    }
+
+    [Test]
+    public async Task GetShiftSchedule_WithGroupFilter_Should_Return_Shift_In_Grandchild_Group()
+    {
+        // Arrange
+        var grandparentGroup = await CreateTestGroup("GrandparentGroup");
+        var parentGroup = await CreateTestGroup("ParentGroupNested", grandparentGroup.Id);
+        var childGroup = await CreateTestGroup("ChildGroupNested", parentGroup.Id);
+        var shiftInGrandchildGroup = await CreateTestShift("InGrandchildGroupShift", isMonday: true);
+        await AssignShiftToGroup(shiftInGrandchildGroup.Id, childGroup.Id);
+
+        var monday = GetNextWeekday(DayOfWeek.Monday);
+        var startDate = monday;
+        var endDate = monday;
+
+        // Act
+        var result = await _service.GetShiftScheduleAsync(
+            startDate,
+            endDate,
+            null,
+            grandparentGroup.Id);
+
+        // Assert
+        var shiftResults = result.Where(r => r.ShiftId == shiftInGrandchildGroup.Id).ToList();
+        shiftResults.Should().HaveCount(1, "Shift in grandchild group should be returned when grandparent is selected");
+    }
+
+    [Test]
+    public async Task GetShiftSchedule_WithGroupFilter_Should_Not_Return_Shift_When_Child_Group_Selected()
+    {
+        // Arrange
+        var parentGroup = await CreateTestGroup("ParentGroupReverse");
+        var childGroup = await CreateTestGroup("ChildGroupReverse", parentGroup.Id);
+        var shiftInParentGroup = await CreateTestShift("InParentGroupShift", isMonday: true);
+        await AssignShiftToGroup(shiftInParentGroup.Id, parentGroup.Id);
+
+        var monday = GetNextWeekday(DayOfWeek.Monday);
+        var startDate = monday;
+        var endDate = monday;
+
+        // Act
+        var result = await _service.GetShiftScheduleAsync(
+            startDate,
+            endDate,
+            null,
+            childGroup.Id);
+
+        // Assert
+        var shiftResults = result.Where(r => r.ShiftId == shiftInParentGroup.Id).ToList();
+        shiftResults.Should().BeEmpty("Shift in parent group should not be returned when child is selected");
+    }
+
+    [Test]
+    public async Task GetShiftSchedule_WithoutGroupFilter_Should_Return_All_Shifts()
+    {
+        // Arrange
+        var group = await CreateTestGroup("FilterTestAll");
+        var shiftWithGroup = await CreateTestShift("WithGroupShift", isMonday: true);
+        var shiftWithoutGroup = await CreateTestShift("WithoutGroupShift2", isMonday: true);
+        await AssignShiftToGroup(shiftWithGroup.Id, group.Id);
+
+        var monday = GetNextWeekday(DayOfWeek.Monday);
+        var startDate = monday;
+        var endDate = monday;
+
+        // Act
+        var result = await _service.GetShiftScheduleAsync(
+            startDate,
+            endDate,
+            null,
+            null);
+
+        // Assert
+        var shiftWithGroupResults = result.Where(r => r.ShiftId == shiftWithGroup.Id).ToList();
+        var shiftWithoutGroupResults = result.Where(r => r.ShiftId == shiftWithoutGroup.Id).ToList();
+        shiftWithGroupResults.Should().HaveCount(1, "Shift with group should be returned when no filter");
+        shiftWithoutGroupResults.Should().HaveCount(1, "Shift without group should be returned when no filter");
+    }
+
+    [Test]
+    public async Task GetShiftSchedule_WithGroupFilter_Should_Return_Shift_With_Multiple_Groups_If_One_Matches()
+    {
+        // Arrange
+        var groupA = await CreateTestGroup("MultiGroupA");
+        var groupB = await CreateTestGroup("MultiGroupB");
+        var shiftWithMultipleGroups = await CreateTestShift("MultiGroupShift", isMonday: true);
+        await AssignShiftToGroup(shiftWithMultipleGroups.Id, groupA.Id);
+        await AssignShiftToGroup(shiftWithMultipleGroups.Id, groupB.Id);
+
+        var monday = GetNextWeekday(DayOfWeek.Monday);
+        var startDate = monday;
+        var endDate = monday;
+
+        // Act
+        var result = await _service.GetShiftScheduleAsync(
+            startDate,
+            endDate,
+            null,
+            groupA.Id);
+
+        // Assert
+        var shiftResults = result.Where(r => r.ShiftId == shiftWithMultipleGroups.Id).ToList();
+        shiftResults.Should().HaveCount(1, "Shift with multiple groups should be returned if one matches");
     }
 
     #endregion
