@@ -909,4 +909,199 @@ public class GetShiftScheduleTests
     }
 
     #endregion
+
+    #region Visibility Filter Tests (Non-Admin with GroupVisibility)
+
+    [Test]
+    public async Task GetShiftSchedule_WithVisibleGroups_Should_Return_Shift_Without_Group()
+    {
+        // Arrange
+        var visibleGroup = await CreateTestGroup("VisibleGroup1");
+        var shiftWithoutGroup = await CreateTestShift("NoGroupVisibility", isMonday: true);
+
+        var monday = GetNextWeekday(DayOfWeek.Monday);
+        var startDate = monday;
+        var endDate = monday;
+
+        // Act
+        var result = await _service.GetShiftScheduleAsync(
+            startDate,
+            endDate,
+            null,
+            null,
+            new List<Guid> { visibleGroup.Id });
+
+        // Assert
+        var shiftResults = result.Where(r => r.ShiftId == shiftWithoutGroup.Id).ToList();
+        shiftResults.Should().HaveCount(1, "Shifts without group should always be visible");
+    }
+
+    [Test]
+    public async Task GetShiftSchedule_WithVisibleGroups_Should_Return_Shift_In_Visible_Group()
+    {
+        // Arrange
+        var visibleGroup = await CreateTestGroup("VisibleGroup2");
+        var shiftInVisibleGroup = await CreateTestShift("InVisibleGroup", isMonday: true);
+        await AssignShiftToGroup(shiftInVisibleGroup.Id, visibleGroup.Id);
+
+        var monday = GetNextWeekday(DayOfWeek.Monday);
+        var startDate = monday;
+        var endDate = monday;
+
+        // Act
+        var result = await _service.GetShiftScheduleAsync(
+            startDate,
+            endDate,
+            null,
+            null,
+            new List<Guid> { visibleGroup.Id });
+
+        // Assert
+        var shiftResults = result.Where(r => r.ShiftId == shiftInVisibleGroup.Id).ToList();
+        shiftResults.Should().HaveCount(1, "Shift in visible group should be returned");
+    }
+
+    [Test]
+    public async Task GetShiftSchedule_WithVisibleGroups_Should_Not_Return_Shift_In_Non_Visible_Group()
+    {
+        // Arrange
+        var visibleGroup = await CreateTestGroup("VisibleGroupOnly");
+        var nonVisibleGroup = await CreateTestGroup("NonVisibleGroup");
+        var shiftInNonVisibleGroup = await CreateTestShift("InNonVisibleGroup", isMonday: true);
+        await AssignShiftToGroup(shiftInNonVisibleGroup.Id, nonVisibleGroup.Id);
+
+        var monday = GetNextWeekday(DayOfWeek.Monday);
+        var startDate = monday;
+        var endDate = monday;
+
+        // Act
+        var result = await _service.GetShiftScheduleAsync(
+            startDate,
+            endDate,
+            null,
+            null,
+            new List<Guid> { visibleGroup.Id });
+
+        // Assert
+        var shiftResults = result.Where(r => r.ShiftId == shiftInNonVisibleGroup.Id).ToList();
+        shiftResults.Should().BeEmpty("Shift in non-visible group should not be returned");
+    }
+
+    [Test]
+    public async Task GetShiftSchedule_WithVisibleGroups_Should_Return_Shift_In_Child_Of_Visible_Group()
+    {
+        // Arrange
+        var visibleParentGroup = await CreateTestGroup("VisibleParent");
+        var childGroup = await CreateTestGroup("ChildOfVisible", visibleParentGroup.Id);
+        var shiftInChildGroup = await CreateTestShift("InChildOfVisible", isMonday: true);
+        await AssignShiftToGroup(shiftInChildGroup.Id, childGroup.Id);
+
+        var monday = GetNextWeekday(DayOfWeek.Monday);
+        var startDate = monday;
+        var endDate = monday;
+
+        // Act
+        var result = await _service.GetShiftScheduleAsync(
+            startDate,
+            endDate,
+            null,
+            null,
+            new List<Guid> { visibleParentGroup.Id });
+
+        // Assert
+        var shiftResults = result.Where(r => r.ShiftId == shiftInChildGroup.Id).ToList();
+        shiftResults.Should().HaveCount(1, "Shift in child of visible group should be returned");
+    }
+
+    [Test]
+    public async Task GetShiftSchedule_WithMultipleVisibleGroups_Should_Return_Shifts_In_Any_Visible_Group()
+    {
+        // Arrange
+        var visibleGroup1 = await CreateTestGroup("MultiVisible1");
+        var visibleGroup2 = await CreateTestGroup("MultiVisible2");
+        var nonVisibleGroup = await CreateTestGroup("MultiNonVisible");
+
+        var shiftInGroup1 = await CreateTestShift("InMultiVisible1", isMonday: true);
+        var shiftInGroup2 = await CreateTestShift("InMultiVisible2", isMonday: true);
+        var shiftInNonVisible = await CreateTestShift("InMultiNonVisible", isMonday: true);
+
+        await AssignShiftToGroup(shiftInGroup1.Id, visibleGroup1.Id);
+        await AssignShiftToGroup(shiftInGroup2.Id, visibleGroup2.Id);
+        await AssignShiftToGroup(shiftInNonVisible.Id, nonVisibleGroup.Id);
+
+        var monday = GetNextWeekday(DayOfWeek.Monday);
+        var startDate = monday;
+        var endDate = monday;
+
+        // Act
+        var result = await _service.GetShiftScheduleAsync(
+            startDate,
+            endDate,
+            null,
+            null,
+            new List<Guid> { visibleGroup1.Id, visibleGroup2.Id });
+
+        // Assert
+        result.Where(r => r.ShiftId == shiftInGroup1.Id).Should().HaveCount(1);
+        result.Where(r => r.ShiftId == shiftInGroup2.Id).Should().HaveCount(1);
+        result.Where(r => r.ShiftId == shiftInNonVisible.Id).Should().BeEmpty();
+    }
+
+    [Test]
+    public async Task GetShiftSchedule_WithEmptyVisibleGroups_Should_Return_All_Shifts()
+    {
+        // Arrange
+        var group = await CreateTestGroup("AdminTestGroup");
+        var shiftWithGroup = await CreateTestShift("AdminTestWithGroup", isMonday: true);
+        var shiftWithoutGroup = await CreateTestShift("AdminTestWithoutGroup", isMonday: true);
+        await AssignShiftToGroup(shiftWithGroup.Id, group.Id);
+
+        var monday = GetNextWeekday(DayOfWeek.Monday);
+        var startDate = monday;
+        var endDate = monday;
+
+        // Act
+        var result = await _service.GetShiftScheduleAsync(
+            startDate,
+            endDate,
+            null,
+            null,
+            new List<Guid>());
+
+        // Assert
+        result.Where(r => r.ShiftId == shiftWithGroup.Id).Should().HaveCount(1, "Admin should see shift with group");
+        result.Where(r => r.ShiftId == shiftWithoutGroup.Id).Should().HaveCount(1, "Admin should see shift without group");
+    }
+
+    [Test]
+    public async Task GetShiftSchedule_SelectedGroupOverridesVisibleGroups()
+    {
+        // Arrange
+        var selectedGroup = await CreateTestGroup("SelectedOverride");
+        var visibleGroup = await CreateTestGroup("VisibleOverride");
+
+        var shiftInSelected = await CreateTestShift("InSelectedOverride", isMonday: true);
+        var shiftInVisible = await CreateTestShift("InVisibleOverride", isMonday: true);
+
+        await AssignShiftToGroup(shiftInSelected.Id, selectedGroup.Id);
+        await AssignShiftToGroup(shiftInVisible.Id, visibleGroup.Id);
+
+        var monday = GetNextWeekday(DayOfWeek.Monday);
+        var startDate = monday;
+        var endDate = monday;
+
+        // Act
+        var result = await _service.GetShiftScheduleAsync(
+            startDate,
+            endDate,
+            null,
+            selectedGroup.Id,
+            new List<Guid> { visibleGroup.Id });
+
+        // Assert
+        result.Where(r => r.ShiftId == shiftInSelected.Id).Should().HaveCount(1, "Selected group filter takes precedence");
+        result.Where(r => r.ShiftId == shiftInVisible.Id).Should().BeEmpty("Visible group should be ignored when selected group is provided");
+    }
+
+    #endregion
 }
