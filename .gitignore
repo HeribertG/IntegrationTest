@@ -690,3 +690,4 @@ appsettings.*.json
 *.pdb
 *.json
 
+/bin/Debug/net10.0/nunit_random_seed.tmp
