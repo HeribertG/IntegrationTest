@@ -144,7 +144,7 @@ public class GetShiftScheduleTests
         var endDate = monday.AddDays(6);
 
         // Act
-        var result = await _service.GetShiftScheduleAsync(startDate, endDate);
+        var result = await _service.GetShiftScheduleQuery(startDate, endDate).ToListAsync();
 
         // Assert
         var mondayResults = result.Where(r => r.ShiftId == mondayShift.Id).ToList();
@@ -164,7 +164,7 @@ public class GetShiftScheduleTests
         var endDate = tuesday.AddDays(1);
 
         // Act
-        var result = await _service.GetShiftScheduleAsync(startDate, endDate);
+        var result = await _service.GetShiftScheduleQuery(startDate, endDate).ToListAsync();
 
         // Assert
         var tuesdayResults = result.Where(r => r.ShiftId == tuesdayShift.Id).ToList();
@@ -183,7 +183,7 @@ public class GetShiftScheduleTests
         var endDate = wednesday.AddDays(1);
 
         // Act
-        var result = await _service.GetShiftScheduleAsync(startDate, endDate);
+        var result = await _service.GetShiftScheduleQuery(startDate, endDate).ToListAsync();
 
         // Assert
         var wednesdayResults = result.Where(r => r.ShiftId == wednesdayShift.Id).ToList();
@@ -202,7 +202,7 @@ public class GetShiftScheduleTests
         var endDate = thursday.AddDays(1);
 
         // Act
-        var result = await _service.GetShiftScheduleAsync(startDate, endDate);
+        var result = await _service.GetShiftScheduleQuery(startDate, endDate).ToListAsync();
 
         // Assert
         var thursdayResults = result.Where(r => r.ShiftId == thursdayShift.Id).ToList();
@@ -221,7 +221,7 @@ public class GetShiftScheduleTests
         var endDate = friday.AddDays(1);
 
         // Act
-        var result = await _service.GetShiftScheduleAsync(startDate, endDate);
+        var result = await _service.GetShiftScheduleQuery(startDate, endDate).ToListAsync();
 
         // Assert
         var fridayResults = result.Where(r => r.ShiftId == fridayShift.Id).ToList();
@@ -240,7 +240,7 @@ public class GetShiftScheduleTests
         var endDate = saturday.AddDays(1);
 
         // Act
-        var result = await _service.GetShiftScheduleAsync(startDate, endDate);
+        var result = await _service.GetShiftScheduleQuery(startDate, endDate).ToListAsync();
 
         // Assert
         var saturdayResults = result.Where(r => r.ShiftId == saturdayShift.Id).ToList();
@@ -259,7 +259,7 @@ public class GetShiftScheduleTests
         var endDate = sunday.AddDays(1);
 
         // Act
-        var result = await _service.GetShiftScheduleAsync(startDate, endDate);
+        var result = await _service.GetShiftScheduleQuery(startDate, endDate).ToListAsync();
 
         // Assert
         var sundayResults = result.Where(r => r.ShiftId == sundayShift.Id).ToList();
@@ -284,7 +284,7 @@ public class GetShiftScheduleTests
         var endDate = monday.AddDays(6);
 
         // Act
-        var result = await _service.GetShiftScheduleAsync(startDate, endDate);
+        var result = await _service.GetShiftScheduleQuery(startDate, endDate).ToListAsync();
 
         // Assert
         var shiftResults = result.Where(r => r.ShiftId == multiDayShift.Id).ToList();
@@ -303,7 +303,7 @@ public class GetShiftScheduleTests
         var endDate = tuesday.AddDays(5);
 
         // Act
-        var result = await _service.GetShiftScheduleAsync(startDate, endDate);
+        var result = await _service.GetShiftScheduleQuery(startDate, endDate).ToListAsync();
 
         // Assert
         var shiftResults = result.Where(r => r.ShiftId == mondayOnlyShift.Id).ToList();
@@ -326,7 +326,7 @@ public class GetShiftScheduleTests
         var endDate = today.AddDays(7);
 
         // Act
-        var result = await _service.GetShiftScheduleAsync(startDate, endDate, new List<DateOnly> { holidayDate });
+        var result = await _service.GetShiftScheduleQuery(startDate, endDate, new List<DateOnly> { holidayDate }).ToListAsync();
 
         // Assert
         var shiftResults = result.Where(r => r.ShiftId == holidayShift.Id).ToList();
@@ -345,7 +345,7 @@ public class GetShiftScheduleTests
         var endDate = today.AddDays(7);
 
         // Act
-        var result = await _service.GetShiftScheduleAsync(startDate, endDate);
+        var result = await _service.GetShiftScheduleQuery(startDate, endDate).ToListAsync();
 
         // Assert
         var shiftResults = result.Where(r => r.ShiftId == holidayShift.Id).ToList();
@@ -365,9 +365,9 @@ public class GetShiftScheduleTests
         var endDate = today.AddDays(7);
 
         // Act
-        var result = await _service.GetShiftScheduleAsync(
+        var result = await _service.GetShiftScheduleQuery(
             startDate, endDate,
-            new List<DateOnly> { holiday1, holiday2 });
+            new List<DateOnly> { holiday1, holiday2 }).ToListAsync();
 
         // Assert
         var shiftResults = result.Where(r => r.ShiftId == holidayShift.Id).ToList();
@@ -386,9 +386,9 @@ public class GetShiftScheduleTests
         var endDate = monday.AddDays(1);
 
         // Act
-        var result = await _service.GetShiftScheduleAsync(
+        var result = await _service.GetShiftScheduleQuery(
             startDate, endDate,
-            new List<DateOnly> { monday });
+            new List<DateOnly> { monday }).ToListAsync();
 
         // Assert
         var shiftResults = result.Where(r => r.ShiftId == mondayShift.Id).ToList();
@@ -410,7 +410,7 @@ public class GetShiftScheduleTests
         var endDate = monday.AddDays(4);
 
         // Act
-        var result = await _service.GetShiftScheduleAsync(startDate, endDate);
+        var result = await _service.GetShiftScheduleQuery(startDate, endDate).ToListAsync();
 
         // Assert
         var shiftResults = result.Where(r => r.ShiftId == weekdayAndHolidayShift.Id).ToList();
@@ -429,9 +429,9 @@ public class GetShiftScheduleTests
         var endDate = saturday.AddDays(1);
 
         // Act
-        var result = await _service.GetShiftScheduleAsync(
+        var result = await _service.GetShiftScheduleQuery(
             startDate, endDate,
-            new List<DateOnly> { saturday });
+            new List<DateOnly> { saturday }).ToListAsync();
 
         // Assert
         var shiftResults = result.Where(r => r.ShiftId == weekdayAndHolidayShift.Id).ToList();
@@ -451,7 +451,7 @@ public class GetShiftScheduleTests
         var endDate = sunday;
 
         // Act
-        var result = await _service.GetShiftScheduleAsync(startDate, endDate);
+        var result = await _service.GetShiftScheduleQuery(startDate, endDate).ToListAsync();
 
         // Assert
         var shiftResults = result.Where(r => r.ShiftId == weekdayAndHolidayShift.Id).ToList();
@@ -470,9 +470,9 @@ public class GetShiftScheduleTests
         var endDate = saturday;
 
         // Act
-        var result = await _service.GetShiftScheduleAsync(
+        var result = await _service.GetShiftScheduleQuery(
             startDate, endDate,
-            new List<DateOnly> { saturday });
+            new List<DateOnly> { saturday }).ToListAsync();
 
         // Assert
         var shiftResults = result.Where(r => r.ShiftId == weekdayAndHolidayShift.Id).ToList();
@@ -492,9 +492,9 @@ public class GetShiftScheduleTests
         var endDate = monday;
 
         // Act
-        var result = await _service.GetShiftScheduleAsync(
+        var result = await _service.GetShiftScheduleQuery(
             startDate, endDate,
-            new List<DateOnly> { monday });
+            new List<DateOnly> { monday }).ToListAsync();
 
         // Assert
         var shiftResults = result.Where(r => r.ShiftId == weekdayAndHolidayShift.Id).ToList();
@@ -517,9 +517,9 @@ public class GetShiftScheduleTests
         var endDate = saturday;
 
         // Act
-        var result = await _service.GetShiftScheduleAsync(
+        var result = await _service.GetShiftScheduleQuery(
             startDate, endDate,
-            new List<DateOnly> { saturday });
+            new List<DateOnly> { saturday }).ToListAsync();
 
         // Assert
         result.Where(r => r.ShiftId == holidayOnlyShift.Id).Should().HaveCount(1);
@@ -538,7 +538,7 @@ public class GetShiftScheduleTests
         var endDate = tuesday;
 
         // Act
-        var result = await _service.GetShiftScheduleAsync(startDate, endDate);
+        var result = await _service.GetShiftScheduleQuery(startDate, endDate).ToListAsync();
 
         // Assert
         result.Where(r => r.ShiftId == holidayOnlyShift.Id).Should().BeEmpty();
@@ -556,7 +556,7 @@ public class GetShiftScheduleTests
         var endDate = wednesday;
 
         // Act
-        var result = await _service.GetShiftScheduleAsync(startDate, endDate);
+        var result = await _service.GetShiftScheduleQuery(startDate, endDate).ToListAsync();
 
         // Assert
         result.Where(r => r.ShiftId == holidayOnlyShift.Id).Should().BeEmpty();
@@ -581,7 +581,7 @@ public class GetShiftScheduleTests
         var endDate = currentMonday;
 
         // Act
-        var result = await _service.GetShiftScheduleAsync(startDate, endDate);
+        var result = await _service.GetShiftScheduleQuery(startDate, endDate).ToListAsync();
 
         // Assert
         var shiftResults = result.Where(r => r.ShiftId == futureShift.Id).ToList();
@@ -604,7 +604,7 @@ public class GetShiftScheduleTests
         var endDate = currentMonday;
 
         // Act
-        var result = await _service.GetShiftScheduleAsync(startDate, endDate);
+        var result = await _service.GetShiftScheduleQuery(startDate, endDate).ToListAsync();
 
         // Assert
         var shiftResults = result.Where(r => r.ShiftId == expiredShift.Id).ToList();
@@ -629,7 +629,7 @@ public class GetShiftScheduleTests
         var endDate = monday;
 
         // Act
-        var result = await _service.GetShiftScheduleAsync(startDate, endDate);
+        var result = await _service.GetShiftScheduleQuery(startDate, endDate).ToListAsync();
 
         // Assert
         var shiftResults = result.Where(r => r.ShiftId == nightShift.Id).ToList();
@@ -651,7 +651,7 @@ public class GetShiftScheduleTests
         var endDate = sunday;
 
         // Act
-        var result = await _service.GetShiftScheduleAsync(startDate, endDate);
+        var result = await _service.GetShiftScheduleQuery(startDate, endDate).ToListAsync();
 
         // Assert
         var shiftResults = result.Where(r => r.ShiftId == nightShift.Id).ToList();
@@ -719,11 +719,11 @@ public class GetShiftScheduleTests
         var endDate = monday;
 
         // Act
-        var result = await _service.GetShiftScheduleAsync(
+        var result = await _service.GetShiftScheduleQuery(
             startDate,
             endDate,
             null,
-            group.Id);
+            group.Id).ToListAsync();
 
         // Assert
         var shiftResults = result.Where(r => r.ShiftId == shiftWithoutGroup.Id).ToList();
@@ -743,11 +743,11 @@ public class GetShiftScheduleTests
         var endDate = monday;
 
         // Act
-        var result = await _service.GetShiftScheduleAsync(
+        var result = await _service.GetShiftScheduleQuery(
             startDate,
             endDate,
             null,
-            group.Id);
+            group.Id).ToListAsync();
 
         // Assert
         var shiftResults = result.Where(r => r.ShiftId == shiftInGroup.Id).ToList();
@@ -768,11 +768,11 @@ public class GetShiftScheduleTests
         var endDate = monday;
 
         // Act
-        var result = await _service.GetShiftScheduleAsync(
+        var result = await _service.GetShiftScheduleQuery(
             startDate,
             endDate,
             null,
-            groupB.Id);
+            groupB.Id).ToListAsync();
 
         // Assert
         var shiftResults = result.Where(r => r.ShiftId == shiftInGroupA.Id).ToList();
@@ -793,11 +793,11 @@ public class GetShiftScheduleTests
         var endDate = monday;
 
         // Act
-        var result = await _service.GetShiftScheduleAsync(
+        var result = await _service.GetShiftScheduleQuery(
             startDate,
             endDate,
             null,
-            parentGroup.Id);
+            parentGroup.Id).ToListAsync();
 
         // Assert
         var shiftResults = result.Where(r => r.ShiftId == shiftInChildGroup.Id).ToList();
@@ -819,11 +819,11 @@ public class GetShiftScheduleTests
         var endDate = monday;
 
         // Act
-        var result = await _service.GetShiftScheduleAsync(
+        var result = await _service.GetShiftScheduleQuery(
             startDate,
             endDate,
             null,
-            grandparentGroup.Id);
+            grandparentGroup.Id).ToListAsync();
 
         // Assert
         var shiftResults = result.Where(r => r.ShiftId == shiftInGrandchildGroup.Id).ToList();
@@ -844,11 +844,11 @@ public class GetShiftScheduleTests
         var endDate = monday;
 
         // Act
-        var result = await _service.GetShiftScheduleAsync(
+        var result = await _service.GetShiftScheduleQuery(
             startDate,
             endDate,
             null,
-            childGroup.Id);
+            childGroup.Id).ToListAsync();
 
         // Assert
         var shiftResults = result.Where(r => r.ShiftId == shiftInParentGroup.Id).ToList();
@@ -869,11 +869,11 @@ public class GetShiftScheduleTests
         var endDate = monday;
 
         // Act
-        var result = await _service.GetShiftScheduleAsync(
+        var result = await _service.GetShiftScheduleQuery(
             startDate,
             endDate,
             null,
-            null);
+            null).ToListAsync();
 
         // Assert
         var shiftWithGroupResults = result.Where(r => r.ShiftId == shiftWithGroup.Id).ToList();
@@ -897,11 +897,11 @@ public class GetShiftScheduleTests
         var endDate = monday;
 
         // Act
-        var result = await _service.GetShiftScheduleAsync(
+        var result = await _service.GetShiftScheduleQuery(
             startDate,
             endDate,
             null,
-            groupA.Id);
+            groupA.Id).ToListAsync();
 
         // Assert
         var shiftResults = result.Where(r => r.ShiftId == shiftWithMultipleGroups.Id).ToList();
@@ -924,12 +924,12 @@ public class GetShiftScheduleTests
         var endDate = monday;
 
         // Act
-        var result = await _service.GetShiftScheduleAsync(
+        var result = await _service.GetShiftScheduleQuery(
             startDate,
             endDate,
             null,
             null,
-            new List<Guid> { visibleGroup.Id });
+            new List<Guid> { visibleGroup.Id }).ToListAsync();
 
         // Assert
         var shiftResults = result.Where(r => r.ShiftId == shiftWithoutGroup.Id).ToList();
@@ -949,12 +949,12 @@ public class GetShiftScheduleTests
         var endDate = monday;
 
         // Act
-        var result = await _service.GetShiftScheduleAsync(
+        var result = await _service.GetShiftScheduleQuery(
             startDate,
             endDate,
             null,
             null,
-            new List<Guid> { visibleGroup.Id });
+            new List<Guid> { visibleGroup.Id }).ToListAsync();
 
         // Assert
         var shiftResults = result.Where(r => r.ShiftId == shiftInVisibleGroup.Id).ToList();
@@ -975,12 +975,12 @@ public class GetShiftScheduleTests
         var endDate = monday;
 
         // Act
-        var result = await _service.GetShiftScheduleAsync(
+        var result = await _service.GetShiftScheduleQuery(
             startDate,
             endDate,
             null,
             null,
-            new List<Guid> { visibleGroup.Id });
+            new List<Guid> { visibleGroup.Id }).ToListAsync();
 
         // Assert
         var shiftResults = result.Where(r => r.ShiftId == shiftInNonVisibleGroup.Id).ToList();
@@ -1001,12 +1001,12 @@ public class GetShiftScheduleTests
         var endDate = monday;
 
         // Act
-        var result = await _service.GetShiftScheduleAsync(
+        var result = await _service.GetShiftScheduleQuery(
             startDate,
             endDate,
             null,
             null,
-            new List<Guid> { visibleParentGroup.Id });
+            new List<Guid> { visibleParentGroup.Id }).ToListAsync();
 
         // Assert
         var shiftResults = result.Where(r => r.ShiftId == shiftInChildGroup.Id).ToList();
@@ -1034,12 +1034,12 @@ public class GetShiftScheduleTests
         var endDate = monday;
 
         // Act
-        var result = await _service.GetShiftScheduleAsync(
+        var result = await _service.GetShiftScheduleQuery(
             startDate,
             endDate,
             null,
             null,
-            new List<Guid> { visibleGroup1.Id, visibleGroup2.Id });
+            new List<Guid> { visibleGroup1.Id, visibleGroup2.Id }).ToListAsync();
 
         // Assert
         result.Where(r => r.ShiftId == shiftInGroup1.Id).Should().HaveCount(1);
@@ -1061,12 +1061,12 @@ public class GetShiftScheduleTests
         var endDate = monday;
 
         // Act
-        var result = await _service.GetShiftScheduleAsync(
+        var result = await _service.GetShiftScheduleQuery(
             startDate,
             endDate,
             null,
             null,
-            new List<Guid>());
+            new List<Guid>()).ToListAsync();
 
         // Assert
         result.Where(r => r.ShiftId == shiftWithGroup.Id).Should().HaveCount(1, "Admin should see shift with group");
@@ -1091,12 +1091,12 @@ public class GetShiftScheduleTests
         var endDate = monday;
 
         // Act
-        var result = await _service.GetShiftScheduleAsync(
+        var result = await _service.GetShiftScheduleQuery(
             startDate,
             endDate,
             null,
             selectedGroup.Id,
-            new List<Guid> { visibleGroup.Id });
+            new List<Guid> { visibleGroup.Id }).ToListAsync();
 
         // Assert
         result.Where(r => r.ShiftId == shiftInSelected.Id).Should().HaveCount(1, "Selected group filter takes precedence");
