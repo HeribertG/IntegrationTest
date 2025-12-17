@@ -619,9 +619,11 @@ public class GetShiftScheduleTests
     public async Task GetShiftSchedule_CuttingAfterMidnight_Should_Show_On_Next_Day()
     {
         // Arrange
+        // Frontend shifts weekdays forward when cuttingAfterMidnight = true
+        // So a "Sunday night shift" is saved with isMonday = true
         var nightShift = await CreateTestShift(
             "NightShiftSunday",
-            isSunday: true,
+            isMonday: true,
             cuttingAfterMidnight: true);
 
         var monday = GetNextWeekday(DayOfWeek.Monday);
@@ -641,9 +643,11 @@ public class GetShiftScheduleTests
     public async Task GetShiftSchedule_CuttingAfterMidnight_Should_Not_Show_On_Same_Day()
     {
         // Arrange
+        // Frontend shifts weekdays forward when cuttingAfterMidnight = true
+        // So a "Sunday night shift" is saved with isMonday = true, not isSunday
         var nightShift = await CreateTestShift(
             "NightShiftSundayNoSameDay",
-            isSunday: true,
+            isMonday: true,
             cuttingAfterMidnight: true);
 
         var sunday = GetNextWeekday(DayOfWeek.Sunday);
@@ -723,7 +727,7 @@ public class GetShiftScheduleTests
             startDate,
             endDate,
             null,
-            group.Id).ToListAsync();
+            new List<Guid> { group.Id }).ToListAsync();
 
         // Assert
         var shiftResults = result.Where(r => r.ShiftId == shiftWithoutGroup.Id).ToList();
@@ -747,7 +751,7 @@ public class GetShiftScheduleTests
             startDate,
             endDate,
             null,
-            group.Id).ToListAsync();
+            new List<Guid> { group.Id }).ToListAsync();
 
         // Assert
         var shiftResults = result.Where(r => r.ShiftId == shiftInGroup.Id).ToList();
@@ -772,7 +776,7 @@ public class GetShiftScheduleTests
             startDate,
             endDate,
             null,
-            groupB.Id).ToListAsync();
+            new List<Guid> { groupB.Id }).ToListAsync();
 
         // Assert
         var shiftResults = result.Where(r => r.ShiftId == shiftInGroupA.Id).ToList();
@@ -797,7 +801,7 @@ public class GetShiftScheduleTests
             startDate,
             endDate,
             null,
-            parentGroup.Id).ToListAsync();
+            new List<Guid> { parentGroup.Id }).ToListAsync();
 
         // Assert
         var shiftResults = result.Where(r => r.ShiftId == shiftInChildGroup.Id).ToList();
@@ -823,7 +827,7 @@ public class GetShiftScheduleTests
             startDate,
             endDate,
             null,
-            grandparentGroup.Id).ToListAsync();
+            new List<Guid> { grandparentGroup.Id }).ToListAsync();
 
         // Assert
         var shiftResults = result.Where(r => r.ShiftId == shiftInGrandchildGroup.Id).ToList();
@@ -848,7 +852,7 @@ public class GetShiftScheduleTests
             startDate,
             endDate,
             null,
-            childGroup.Id).ToListAsync();
+            new List<Guid> { childGroup.Id }).ToListAsync();
 
         // Assert
         var shiftResults = result.Where(r => r.ShiftId == shiftInParentGroup.Id).ToList();
@@ -901,7 +905,7 @@ public class GetShiftScheduleTests
             startDate,
             endDate,
             null,
-            groupA.Id).ToListAsync();
+            new List<Guid> { groupA.Id }).ToListAsync();
 
         // Assert
         var shiftResults = result.Where(r => r.ShiftId == shiftWithMultipleGroups.Id).ToList();
@@ -928,7 +932,6 @@ public class GetShiftScheduleTests
             startDate,
             endDate,
             null,
-            null,
             new List<Guid> { visibleGroup.Id }).ToListAsync();
 
         // Assert
@@ -952,7 +955,6 @@ public class GetShiftScheduleTests
         var result = await _service.GetShiftScheduleQuery(
             startDate,
             endDate,
-            null,
             null,
             new List<Guid> { visibleGroup.Id }).ToListAsync();
 
@@ -979,7 +981,6 @@ public class GetShiftScheduleTests
             startDate,
             endDate,
             null,
-            null,
             new List<Guid> { visibleGroup.Id }).ToListAsync();
 
         // Assert
@@ -1004,7 +1005,6 @@ public class GetShiftScheduleTests
         var result = await _service.GetShiftScheduleQuery(
             startDate,
             endDate,
-            null,
             null,
             new List<Guid> { visibleParentGroup.Id }).ToListAsync();
 
@@ -1038,7 +1038,6 @@ public class GetShiftScheduleTests
             startDate,
             endDate,
             null,
-            null,
             new List<Guid> { visibleGroup1.Id, visibleGroup2.Id }).ToListAsync();
 
         // Assert
@@ -1065,7 +1064,6 @@ public class GetShiftScheduleTests
             startDate,
             endDate,
             null,
-            null,
             new List<Guid>()).ToListAsync();
 
         // Assert
@@ -1074,17 +1072,17 @@ public class GetShiftScheduleTests
     }
 
     [Test]
-    public async Task GetShiftSchedule_SelectedGroupOverridesVisibleGroups()
+    public async Task GetShiftSchedule_WithSingleVisibleGroup_OnlyReturnsShiftsInThatGroup()
     {
         // Arrange
-        var selectedGroup = await CreateTestGroup("SelectedOverride");
-        var visibleGroup = await CreateTestGroup("VisibleOverride");
+        var targetGroup = await CreateTestGroup("TargetGroup");
+        var otherGroup = await CreateTestGroup("OtherGroup");
 
-        var shiftInSelected = await CreateTestShift("InSelectedOverride", isMonday: true);
-        var shiftInVisible = await CreateTestShift("InVisibleOverride", isMonday: true);
+        var shiftInTarget = await CreateTestShift("InTargetGroup", isMonday: true);
+        var shiftInOther = await CreateTestShift("InOtherGroup", isMonday: true);
 
-        await AssignShiftToGroup(shiftInSelected.Id, selectedGroup.Id);
-        await AssignShiftToGroup(shiftInVisible.Id, visibleGroup.Id);
+        await AssignShiftToGroup(shiftInTarget.Id, targetGroup.Id);
+        await AssignShiftToGroup(shiftInOther.Id, otherGroup.Id);
 
         var monday = GetNextWeekday(DayOfWeek.Monday);
         var startDate = monday;
@@ -1095,12 +1093,11 @@ public class GetShiftScheduleTests
             startDate,
             endDate,
             null,
-            selectedGroup.Id,
-            new List<Guid> { visibleGroup.Id }).ToListAsync();
+            new List<Guid> { targetGroup.Id }).ToListAsync();
 
         // Assert
-        result.Where(r => r.ShiftId == shiftInSelected.Id).Should().HaveCount(1, "Selected group filter takes precedence");
-        result.Where(r => r.ShiftId == shiftInVisible.Id).Should().BeEmpty("Visible group should be ignored when selected group is provided");
+        result.Where(r => r.ShiftId == shiftInTarget.Id).Should().HaveCount(1, "Shift in target group should be returned");
+        result.Where(r => r.ShiftId == shiftInOther.Id).Should().BeEmpty("Shift in other group should not be returned");
     }
 
     #endregion
