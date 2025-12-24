@@ -1,9 +1,10 @@
 using FluentAssertions;
-using Klacks.Api.Domain.Models.Authentification;
 using Klacks.Api.Domain.Models.Schedules;
 using Klacks.Api.Domain.Models.Staffs;
 using Klacks.Api.Infrastructure.Persistence;
 using Klacks.Api.Presentation.DTOs.Notifications;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -20,10 +21,59 @@ using System.Text;
 
 namespace IntegrationTest.SignalR;
 
+public class SignalRTestWebApplicationFactory : WebApplicationFactory<Program>
+{
+    public const string JWT_SECRET = "tqXc2HF1RDsi/N1LMkGIVrgFSVuJ9PBmFg/QrgzqlfQ=";
+    public const string JWT_ISSUER = "https://localhost:44371";
+    public const string JWT_AUDIENCE = "https://localhost:44371";
+
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
+    {
+        builder.UseEnvironment("Development");
+        builder.ConfigureServices(services =>
+        {
+            services.Configure<AuthenticationOptions>(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            });
+
+            services.PostConfigure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JWT_SECRET)),
+                    ValidateIssuer = true,
+                    ValidIssuer = JWT_ISSUER,
+                    ValidateAudience = true,
+                    ValidAudience = JWT_AUDIENCE,
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.FromMinutes(5)
+                };
+
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+                        var path = context.HttpContext.Request.Path;
+                        if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
+                        {
+                            context.Token = accessToken;
+                        }
+                        return Task.CompletedTask;
+                    }
+                };
+            });
+        });
+    }
+}
+
 [TestFixture]
 public class WorkNotificationHubTests
 {
-    private WebApplicationFactory<Program> _factory = null!;
+    private SignalRTestWebApplicationFactory _factory = null!;
     private HttpClient _httpClient = null!;
     private string _connectionString = null!;
     private DataBaseContext _context = null!;
@@ -31,32 +81,13 @@ public class WorkNotificationHubTests
     private Guid _testClientId;
     private Guid _testShiftId;
 
-    private const string TEST_JWT_SECRET = "ThisIsAVeryLongSecretKeyForTestingPurposesOnly12345";
-    private const string TEST_JWT_ISSUER = "TestIssuer";
-    private const string TEST_JWT_AUDIENCE = "TestAudience";
-
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
         _connectionString = Environment.GetEnvironmentVariable("DATABASE_URL")
             ?? "Host=localhost;Port=5434;Database=klacks1;Username=postgres;Password=admin";
 
-        _factory = new WebApplicationFactory<Program>()
-            .WithWebHostBuilder(builder =>
-            {
-                builder.UseEnvironment("Development");
-                builder.ConfigureServices(services =>
-                {
-                    var jwtSettings = new JwtSettings
-                    {
-                        Secret = TEST_JWT_SECRET,
-                        ValidIssuer = TEST_JWT_ISSUER,
-                        ValidAudience = TEST_JWT_AUDIENCE
-                    };
-                    services.AddSingleton(jwtSettings);
-                });
-            });
-
+        _factory = new SignalRTestWebApplicationFactory();
         _httpClient = _factory.CreateClient();
     }
 
@@ -127,28 +158,28 @@ public class WorkNotificationHubTests
             "DELETE FROM client WHERE id = {0}", _testClientId);
     }
 
-    private string GenerateTestToken(string userId)
+    private static string GenerateTestToken(string userId)
     {
         var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.NameIdentifier, userId),
-            new Claim(ClaimTypes.Email, $"test{userId}@test.com"),
-            new Claim(ClaimTypes.Name, $"TestUser{userId}"),
-            new Claim(ClaimTypes.GivenName, "Test"),
-            new Claim(ClaimTypes.Surname, "User"),
-            new Claim("jti", Guid.NewGuid().ToString()),
-            new Claim("iat", DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
+            new(ClaimTypes.NameIdentifier, userId),
+            new(ClaimTypes.Email, $"test{userId}@test.com"),
+            new(ClaimTypes.Name, $"TestUser{userId}"),
+            new(ClaimTypes.GivenName, "Test"),
+            new(ClaimTypes.Surname, "User"),
+            new("jti", Guid.NewGuid().ToString()),
+            new("iat", DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
         };
 
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(TEST_JWT_SECRET));
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SignalRTestWebApplicationFactory.JWT_SECRET));
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(
-            issuer: TEST_JWT_ISSUER,
-            audience: TEST_JWT_AUDIENCE,
+            issuer: SignalRTestWebApplicationFactory.JWT_ISSUER,
+            audience: SignalRTestWebApplicationFactory.JWT_AUDIENCE,
             claims: claims,
             expires: DateTime.UtcNow.AddHours(1),
-            notBefore: DateTime.UtcNow,
+            notBefore: DateTime.UtcNow.AddMinutes(-1),
             signingCredentials: creds);
 
         return new JwtSecurityTokenHandler().WriteToken(token);
@@ -156,13 +187,14 @@ public class WorkNotificationHubTests
 
     private HubConnection CreateHubConnection(string token)
     {
-        var hubUrl = $"{_factory.Server.BaseAddress}hubs/work-notifications";
+        var hubUrl = $"{_factory.Server.BaseAddress}hubs/work-notifications?access_token={Uri.EscapeDataString(token)}";
 
         return new HubConnectionBuilder()
             .WithUrl(hubUrl, options =>
             {
-                options.AccessTokenProvider = () => Task.FromResult<string?>(token);
                 options.HttpMessageHandlerFactory = _ => _factory.Server.CreateHandler();
+                options.Transports = Microsoft.AspNetCore.Http.Connections.HttpTransportType.LongPolling;
+                options.SkipNegotiation = false;
             })
             .Build();
     }
@@ -209,9 +241,10 @@ public class WorkNotificationHubTests
         _httpClient.DefaultRequestHeaders.Remove("X-SignalR-ConnectionId");
         _httpClient.DefaultRequestHeaders.Add("X-SignalR-ConnectionId", connectionId1);
 
-        var response = await _httpClient.PostAsJsonAsync("/api/v1/works", workRequest);
+        var response = await _httpClient.PostAsJsonAsync("/api/v1/backend/Works", workRequest);
+        response.EnsureSuccessStatusCode();
 
-        await Task.Delay(1000);
+        await Task.Delay(2000);
 
         // Assert
         receivedByConnection1.Should().BeNull("Sender should not receive their own notification");
@@ -263,7 +296,8 @@ public class WorkNotificationHubTests
         _httpClient.DefaultRequestHeaders.Remove("X-SignalR-ConnectionId");
         _httpClient.DefaultRequestHeaders.Add("X-SignalR-ConnectionId", connectionId1);
 
-        var response = await _httpClient.DeleteAsync($"/api/v1/works/{workId}");
+        var response = await _httpClient.DeleteAsync($"/api/v1/backend/Works/{workId}");
+        response.EnsureSuccessStatusCode();
 
         await Task.Delay(1000);
 
@@ -322,7 +356,8 @@ public class WorkNotificationHubTests
         _httpClient.DefaultRequestHeaders.Remove("X-SignalR-ConnectionId");
         _httpClient.DefaultRequestHeaders.Add("X-SignalR-ConnectionId", connectionId1);
 
-        await _httpClient.PostAsJsonAsync("/api/v1/works", workRequest);
+        var response = await _httpClient.PostAsJsonAsync("/api/v1/backend/Works", workRequest);
+        response.EnsureSuccessStatusCode();
 
         await Task.Delay(1000);
 
