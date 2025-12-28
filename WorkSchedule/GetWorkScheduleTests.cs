@@ -92,6 +92,8 @@ public class GetWorkScheduleTests
             ShiftId = _testShiftId,
             CurrentDate = new DateTime(2025, 1, 15, 0, 0, 0, DateTimeKind.Utc),
             WorkTime = 480,
+            StartShift = new TimeOnly(8, 0, 0),
+            EndShift = new TimeOnly(16, 0, 0),
             IsSealed = false,
             IsDeleted = false
         };

@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Klacks.Api.Domain.Enums;
+using Klacks.Api.Domain.Interfaces;
 using Klacks.Api.Domain.Models.Associations;
 using Klacks.Api.Domain.Models.Schedules;
 using Klacks.Api.Domain.Models.Staffs;
@@ -191,7 +192,8 @@ public class WorkScheduleFilterTests
             .Returns(args => ((IQueryable<Client>)args[0]).Where(c => c.Name!.Contains("TEST_")));
 
         var mockLogger = Substitute.For<ILogger<Work>>();
-        var repository = new WorkRepository(_context, mockLogger, mockGroupFilter, mockSearchFilter);
+        var mockWorkMacroService = Substitute.For<IWorkMacroService>();
+        var repository = new WorkRepository(_context, mockLogger, mockGroupFilter, mockSearchFilter, mockWorkMacroService);
 
         var now = DateTime.UtcNow;
         var filter = new WorkFilter
@@ -228,7 +230,8 @@ public class WorkScheduleFilterTests
             .Returns(args => ((IQueryable<Client>)args[0]).Where(c => c.Name!.Contains("TEST_")));
 
         var mockLogger = Substitute.For<ILogger<Work>>();
-        var repository = new WorkRepository(_context, mockLogger, mockGroupFilter, mockSearchFilter);
+        var mockWorkMacroService = Substitute.For<IWorkMacroService>();
+        var repository = new WorkRepository(_context, mockLogger, mockGroupFilter, mockSearchFilter, mockWorkMacroService);
 
         var now = DateTime.UtcNow;
         var filter = new WorkFilter
@@ -266,7 +269,8 @@ public class WorkScheduleFilterTests
             .Returns(args => ((IQueryable<Client>)args[0]).Where(c => c.Name!.Contains("TEST_")));
 
         var mockLogger = Substitute.For<ILogger<Work>>();
-        var repository = new WorkRepository(_context, mockLogger, mockGroupFilter, mockSearchFilter);
+        var mockWorkMacroService = Substitute.For<IWorkMacroService>();
+        var repository = new WorkRepository(_context, mockLogger, mockGroupFilter, mockSearchFilter, mockWorkMacroService);
 
         var now = DateTime.UtcNow;
         var filter = new WorkFilter
@@ -302,7 +306,8 @@ public class WorkScheduleFilterTests
             .Returns(args => ((IQueryable<Client>)args[0]).Where(c => c.Name!.Contains("TEST_")));
 
         var mockLogger = Substitute.For<ILogger<Work>>();
-        var repository = new WorkRepository(_context, mockLogger, mockGroupFilter, mockSearchFilter);
+        var mockWorkMacroService = Substitute.For<IWorkMacroService>();
+        var repository = new WorkRepository(_context, mockLogger, mockGroupFilter, mockSearchFilter, mockWorkMacroService);
 
         var now = DateTime.UtcNow;
         var filter = new WorkFilter
@@ -341,7 +346,8 @@ public class WorkScheduleFilterTests
             .Returns(args => ((IQueryable<Client>)args[0]).Where(c => c.Name!.Contains("TEST_")));
 
         var mockLogger = Substitute.For<ILogger<Work>>();
-        var repository = new WorkRepository(_context, mockLogger, mockGroupFilter, mockSearchFilter);
+        var mockWorkMacroService = Substitute.For<IWorkMacroService>();
+        var repository = new WorkRepository(_context, mockLogger, mockGroupFilter, mockSearchFilter, mockWorkMacroService);
 
         var now = DateTime.UtcNow;
         var filterWithHours = new WorkFilter
