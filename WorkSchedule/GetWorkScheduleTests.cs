@@ -92,8 +92,8 @@ public class GetWorkScheduleTests
             ShiftId = _testShiftId,
             CurrentDate = new DateTime(2025, 1, 15, 0, 0, 0, DateTimeKind.Utc),
             WorkTime = 480,
-            StartShift = new TimeOnly(8, 0, 0),
-            EndShift = new TimeOnly(16, 0, 0),
+            StartTime = new TimeOnly(8, 0, 0),
+            EndTime = new TimeOnly(16, 0, 0),
             IsSealed = false,
             IsDeleted = false
         };
@@ -155,8 +155,8 @@ public class GetWorkScheduleTests
         result.Should().HaveCount(1);
         result[0].EntryType.Should().Be(0);
         result[0].ShiftName.Should().Be("TEST_Shift");
-        result[0].StartShift.Should().Be(new TimeSpan(8, 0, 0));
-        result[0].EndShift.Should().Be(new TimeSpan(16, 0, 0));
+        result[0].StartTime.Should().Be(new TimeSpan(8, 0, 0));
+        result[0].EndTime.Should().Be(new TimeSpan(16, 0, 0));
     }
 
     [Test]
