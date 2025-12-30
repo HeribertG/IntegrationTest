@@ -213,7 +213,7 @@ public class WorkScheduleFilterTests
         var result = await repository.WorkList(filter);
 
         // Assert
-        var testClients = result.Where(c => c.Name!.Contains("TEST_")).ToList();
+        var testClients = result.Clients.Where(c => c.Name!.Contains("TEST_")).ToList();
         testClients.Should().HaveCount(2);
         testClients.Should().OnlyContain(c => c.Type == EntityTypeEnum.Employee);
     }
@@ -251,7 +251,7 @@ public class WorkScheduleFilterTests
         var result = await repository.WorkList(filter);
 
         // Assert
-        var testClients = result.Where(c => c.Name!.Contains("TEST_")).ToList();
+        var testClients = result.Clients.Where(c => c.Name!.Contains("TEST_")).ToList();
         testClients.Should().HaveCount(1);
         testClients[0].Type.Should().Be(EntityTypeEnum.ExternEmp);
         testClients[0].FirstName.Should().Be("Charlie");
@@ -290,7 +290,7 @@ public class WorkScheduleFilterTests
         var result = await repository.WorkList(filter);
 
         // Assert
-        var testClients = result.Where(c => c.Name!.Contains("TEST_")).ToList();
+        var testClients = result.Clients.Where(c => c.Name!.Contains("TEST_")).ToList();
         testClients.Should().BeEmpty();
     }
 
@@ -328,7 +328,7 @@ public class WorkScheduleFilterTests
         var result = await repository.WorkList(filter);
 
         // Assert
-        var testClients = result.Where(c => c.Name!.Contains("TEST_")).ToList();
+        var testClients = result.Clients.Where(c => c.Name!.Contains("TEST_")).ToList();
         testClients.Should().HaveCount(2);
         testClients[0].FirstName.Should().Be("Alice");
         testClients[1].FirstName.Should().Be("Bob");
@@ -383,8 +383,8 @@ public class WorkScheduleFilterTests
         var resultWithoutHours = await repository.WorkList(filterWithoutHours);
 
         // Assert
-        var testClientsWithHours = resultWithHours.Where(c => c.Name!.Contains("TEST_")).ToList();
-        var testClientsWithoutHours = resultWithoutHours.Where(c => c.Name!.Contains("TEST_")).ToList();
+        var testClientsWithHours = resultWithHours.Clients.Where(c => c.Name!.Contains("TEST_")).ToList();
+        var testClientsWithoutHours = resultWithoutHours.Clients.Where(c => c.Name!.Contains("TEST_")).ToList();
         testClientsWithHours.Should().HaveCount(3);
         testClientsWithoutHours.Should().HaveCount(3);
         testClientsWithHours[0].FirstName.Should().Be("Charlie");
