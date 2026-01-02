@@ -14,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using NSubstitute;
 using NUnit.Framework;
+using System.Collections.Concurrent;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Json;
 using System.Security.Claims;
@@ -319,7 +320,7 @@ public class WorkNotificationHubTests
         await using var connection2 = CreateHubConnection(token2);
         await using var connection3 = CreateHubConnection(token3);
 
-        var receivedNotifications = new List<(string ConnectionName, WorkNotificationDto Notification)>();
+        var receivedNotifications = new ConcurrentBag<(string ConnectionName, WorkNotificationDto Notification)>();
 
         connection1.On<WorkNotificationDto>("WorkCreated", notification =>
         {
