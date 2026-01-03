@@ -73,13 +73,13 @@ public class WorkScheduleFilterTests
         {
             Id = _contractLowId,
             Name = "TEST_Contract_Low",
-            GuaranteedHoursPerMonth = 80
+            GuaranteedHours = 80
         };
         var contractHigh = new Contract
         {
             Id = _contractHighId,
             Name = "TEST_Contract_High",
-            GuaranteedHoursPerMonth = 160
+            GuaranteedHours = 160
         };
         _context.Contract.AddRange(contractLow, contractHigh);
         await _context.SaveChangesAsync();
