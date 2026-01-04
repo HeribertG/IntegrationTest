@@ -6,14 +6,14 @@
 |-----------|-------|
 | Host | localhost |
 | Port | 5434 |
-| Database | klacks1 |
+| Database | klacks |
 | Username | postgres |
 | Password | admin |
 
 ## Connection String
 
 ```
-Host=localhost;Port=5434;Database=klacks1;Username=postgres;Password=admin
+Host=localhost;Port=5434;Database=klacks;Username=postgres;Password=admin
 ```
 
 ## Environment Variable
@@ -21,7 +21,7 @@ Host=localhost;Port=5434;Database=klacks1;Username=postgres;Password=admin
 You can set the connection string via environment variable:
 
 ```bash
-export DATABASE_URL="Host=localhost;Port=5434;Database=klacks1;Username=postgres;Password=admin"
+export DATABASE_URL="Host=localhost;Port=5434;Database=klacks;Username=postgres;Password=admin"
 ```
 
 ## Usage in Tests
@@ -31,7 +31,7 @@ export DATABASE_URL="Host=localhost;Port=5434;Database=klacks1;Username=postgres
 public void OneTimeSetUp()
 {
     _connectionString = Environment.GetEnvironmentVariable("DATABASE_URL")
-        ?? "Host=localhost;Port=5434;Database=klacks1;Username=postgres;Password=admin";
+        ?? "Host=localhost;Port=5434;Database=klacks;Username=postgres;Password=admin";
 }
 
 [SetUp]
@@ -56,7 +56,7 @@ dotnet test IntegrationTest/IntegrationTest.csproj
 dotnet test IntegrationTest/IntegrationTest.csproj --filter "Category=RealDatabase"
 
 # Run with custom connection string
-DATABASE_URL="Host=localhost;Port=5434;Database=klacks1;Username=postgres;Password=admin" dotnet test IntegrationTest/IntegrationTest.csproj
+DATABASE_URL="Host=localhost;Port=5434;Database=klacks;Username=postgres;Password=admin" dotnet test IntegrationTest/IntegrationTest.csproj
 ```
 
 ## Direct Database Access via psql
@@ -64,7 +64,7 @@ DATABASE_URL="Host=localhost;Port=5434;Database=klacks1;Username=postgres;Passwo
 From Windows PowerShell:
 ```powershell
 $env:PGPASSWORD='admin'
-& 'C:\Program Files\PostgreSQL\17\bin\psql.exe' -h localhost -p 5434 -U postgres -d klacks1 -c "SELECT 1"
+& 'C:\Program Files\PostgreSQL\17\bin\psql.exe' -h localhost -p 5434 -U postgres -d klacks -c "SELECT 1"
 ```
 
 ## Client Related Tables

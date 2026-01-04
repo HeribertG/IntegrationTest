@@ -29,7 +29,7 @@ public class GetWorkScheduleTests
     public void OneTimeSetUp()
     {
         _connectionString = Environment.GetEnvironmentVariable("DATABASE_URL")
-            ?? "Host=localhost;Port=5434;Database=klacks1;Username=postgres;Password=admin";
+            ?? "Host=localhost;Port=5434;Database=klacks;Username=postgres;Password=admin";
     }
 
     [SetUp]

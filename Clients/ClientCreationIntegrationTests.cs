@@ -16,11 +16,11 @@ namespace IntegrationTest.Clients;
 /// Database Connection:
 /// - Host: localhost
 /// - Port: 5434
-/// - Database: klacks1
+/// - Database: klacks
 /// - Username: postgres
 /// - Password: admin
 ///
-/// Connection String: "Host=localhost;Port=5434;Database=klacks1;Username=postgres;Password=admin"
+/// Connection String: "Host=localhost;Port=5434;Database=klacks;Username=postgres;Password=admin"
 ///
 /// Or use environment variable DATABASE_URL
 /// </summary>
@@ -37,7 +37,7 @@ public class ClientCreationIntegrationTests
     public async Task OneTimeSetUp()
     {
         _connectionString = Environment.GetEnvironmentVariable("DATABASE_URL")
-            ?? "Host=localhost;Port=5434;Database=klacks1;Username=postgres;Password=admin";
+            ?? "Host=localhost;Port=5434;Database=klacks;Username=postgres;Password=admin";
 
         var options = new DbContextOptionsBuilder<DataBaseContext>()
             .UseNpgsql(_connectionString)

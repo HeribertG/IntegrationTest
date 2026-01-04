@@ -22,11 +22,11 @@ namespace IntegrationTest.Groups;
 /// Database Connection:
 /// - Host: localhost
 /// - Port: 5434
-/// - Database: klacks1
+/// - Database: klacks
 /// - Username: postgres
 /// - Password: admin
 ///
-/// Connection String: "Host=localhost;Port=5434;Database=klacks1;Username=postgres;Password=admin"
+/// Connection String: "Host=localhost;Port=5434;Database=klacks;Username=postgres;Password=admin"
 /// </summary>
 [TestFixture]
 [Category("RealDatabase")]
@@ -44,7 +44,7 @@ public class GroupNestedSetIntegrationTests
     public async Task OneTimeSetUp()
     {
         _connectionString = Environment.GetEnvironmentVariable("DATABASE_URL")
-            ?? "Host=localhost;Port=5434;Database=klacks1;Username=postgres;Password=admin";
+            ?? "Host=localhost;Port=5434;Database=klacks;Username=postgres;Password=admin";
 
         var options = new DbContextOptionsBuilder<DataBaseContext>()
             .UseNpgsql(_connectionString)
