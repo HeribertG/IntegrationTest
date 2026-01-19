@@ -196,12 +196,12 @@ public class WorkScheduleFilterTests
         var repository = new WorkRepository(_context, mockLogger, mockGroupFilter, mockSearchFilter, mockWorkMacroService);
 
         var now = DateTime.UtcNow;
+        var startDate = new DateOnly(now.Year, now.Month, 1).AddDays(-5);
+        var endDate = new DateOnly(now.Year, now.Month, DateTime.DaysInMonth(now.Year, now.Month)).AddDays(5);
         var filter = new WorkFilter
         {
-            CurrentYear = now.Year,
-            CurrentMonth = now.Month,
-            DayVisibleBeforeMonth = 5,
-            DayVisibleAfterMonth = 5,
+            StartDate = startDate,
+            EndDate = endDate,
             ShowEmployees = true,
             ShowExtern = false,
             OrderBy = "name",
@@ -234,12 +234,12 @@ public class WorkScheduleFilterTests
         var repository = new WorkRepository(_context, mockLogger, mockGroupFilter, mockSearchFilter, mockWorkMacroService);
 
         var now = DateTime.UtcNow;
+        var startDate = new DateOnly(now.Year, now.Month, 1).AddDays(-5);
+        var endDate = new DateOnly(now.Year, now.Month, DateTime.DaysInMonth(now.Year, now.Month)).AddDays(5);
         var filter = new WorkFilter
         {
-            CurrentYear = now.Year,
-            CurrentMonth = now.Month,
-            DayVisibleBeforeMonth = 5,
-            DayVisibleAfterMonth = 5,
+            StartDate = startDate,
+            EndDate = endDate,
             ShowEmployees = false,
             ShowExtern = true,
             OrderBy = "name",
@@ -273,12 +273,12 @@ public class WorkScheduleFilterTests
         var repository = new WorkRepository(_context, mockLogger, mockGroupFilter, mockSearchFilter, mockWorkMacroService);
 
         var now = DateTime.UtcNow;
+        var startDate = new DateOnly(now.Year, now.Month, 1).AddDays(-5);
+        var endDate = new DateOnly(now.Year, now.Month, DateTime.DaysInMonth(now.Year, now.Month)).AddDays(5);
         var filter = new WorkFilter
         {
-            CurrentYear = now.Year,
-            CurrentMonth = now.Month,
-            DayVisibleBeforeMonth = 5,
-            DayVisibleAfterMonth = 5,
+            StartDate = startDate,
+            EndDate = endDate,
             ShowEmployees = false,
             ShowExtern = false,
             OrderBy = "name",
@@ -310,12 +310,12 @@ public class WorkScheduleFilterTests
         var repository = new WorkRepository(_context, mockLogger, mockGroupFilter, mockSearchFilter, mockWorkMacroService);
 
         var now = DateTime.UtcNow;
+        var startDate = new DateOnly(now.Year, now.Month, 1).AddDays(-5);
+        var endDate = new DateOnly(now.Year, now.Month, DateTime.DaysInMonth(now.Year, now.Month)).AddDays(5);
         var filter = new WorkFilter
         {
-            CurrentYear = now.Year,
-            CurrentMonth = now.Month,
-            DayVisibleBeforeMonth = 5,
-            DayVisibleAfterMonth = 5,
+            StartDate = startDate,
+            EndDate = endDate,
             ShowEmployees = true,
             ShowExtern = false,
             OrderBy = "name",
@@ -350,12 +350,12 @@ public class WorkScheduleFilterTests
         var repository = new WorkRepository(_context, mockLogger, mockGroupFilter, mockSearchFilter, mockWorkMacroService);
 
         var now = DateTime.UtcNow;
+        var startDate = new DateOnly(now.Year, now.Month, 1).AddDays(-5);
+        var endDate = new DateOnly(now.Year, now.Month, DateTime.DaysInMonth(now.Year, now.Month)).AddDays(5);
         var filterWithHours = new WorkFilter
         {
-            CurrentYear = now.Year,
-            CurrentMonth = now.Month,
-            DayVisibleBeforeMonth = 5,
-            DayVisibleAfterMonth = 5,
+            StartDate = startDate,
+            EndDate = endDate,
             ShowEmployees = true,
             ShowExtern = true,
             OrderBy = "firstName",
@@ -366,10 +366,8 @@ public class WorkScheduleFilterTests
 
         var filterWithoutHours = new WorkFilter
         {
-            CurrentYear = now.Year,
-            CurrentMonth = now.Month,
-            DayVisibleBeforeMonth = 5,
-            DayVisibleAfterMonth = 5,
+            StartDate = startDate,
+            EndDate = endDate,
             ShowEmployees = true,
             ShowExtern = true,
             OrderBy = "firstName",
