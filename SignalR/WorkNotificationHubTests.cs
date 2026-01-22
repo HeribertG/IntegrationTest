@@ -228,13 +228,23 @@ public class WorkNotificationHubTests
 
         var connectionId1 = await connection1.InvokeAsync<string>("GetConnectionId");
 
+        var periodStart = new DateOnly(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1);
+        var periodEnd = periodStart.AddMonths(1).AddDays(-1);
+        var startDateStr = periodStart.ToString("yyyy-MM-dd");
+        var endDateStr = periodEnd.ToString("yyyy-MM-dd");
+
+        await connection1.InvokeAsync("JoinScheduleGroup", startDateStr, endDateStr);
+        await connection2.InvokeAsync("JoinScheduleGroup", startDateStr, endDateStr);
+
         // Act
         var workRequest = new
         {
             ClientId = _testClientId,
             ShiftId = _testShiftId,
             CurrentDate = DateTime.UtcNow.Date,
-            WorkTime = 8
+            WorkTime = 8,
+            PeriodStart = startDateStr,
+            PeriodEnd = endDateStr
         };
 
         _httpClient.DefaultRequestHeaders.Remove("Authorization");
@@ -245,11 +255,15 @@ public class WorkNotificationHubTests
         var response = await _httpClient.PostAsJsonAsync("/api/backend/Works", workRequest);
         response.EnsureSuccessStatusCode();
 
+        var responseContent = await response.Content.ReadAsStringAsync();
+        TestContext.WriteLine($"Response: {responseContent}");
+        TestContext.WriteLine($"Expected group: schedule_{startDateStr}_{endDateStr}");
+
         await Task.Delay(2000);
 
         // Assert
         receivedByConnection1.Should().BeNull("Sender should not receive their own notification");
-        receivedByConnection2.Should().NotBeNull("Other clients should receive the notification");
+        receivedByConnection2.Should().NotBeNull($"Other clients should receive the notification. Response was: {responseContent}");
         receivedByConnection2!.ClientId.Should().Be(_testClientId);
         receivedByConnection2.ShiftId.Should().Be(_testShiftId);
         receivedByConnection2.OperationType.Should().Be("created");
@@ -291,13 +305,21 @@ public class WorkNotificationHubTests
 
         var connectionId1 = await connection1.InvokeAsync<string>("GetConnectionId");
 
+        var periodStart = new DateOnly(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1);
+        var periodEnd = periodStart.AddMonths(1).AddDays(-1);
+        var startDateStr = periodStart.ToString("yyyy-MM-dd");
+        var endDateStr = periodEnd.ToString("yyyy-MM-dd");
+
+        await connection1.InvokeAsync("JoinScheduleGroup", startDateStr, endDateStr);
+        await connection2.InvokeAsync("JoinScheduleGroup", startDateStr, endDateStr);
+
         // Act
         _httpClient.DefaultRequestHeaders.Remove("Authorization");
         _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token1}");
         _httpClient.DefaultRequestHeaders.Remove("X-SignalR-ConnectionId");
         _httpClient.DefaultRequestHeaders.Add("X-SignalR-ConnectionId", connectionId1);
 
-        var response = await _httpClient.DeleteAsync($"/api/backend/Works/{workId}");
+        var response = await _httpClient.DeleteAsync($"/api/backend/Works/{workId}?periodStart={startDateStr}&periodEnd={endDateStr}");
         response.EnsureSuccessStatusCode();
 
         await Task.Delay(1000);
@@ -343,13 +365,24 @@ public class WorkNotificationHubTests
 
         var connectionId1 = await connection1.InvokeAsync<string>("GetConnectionId");
 
+        var periodStart = new DateOnly(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1);
+        var periodEnd = periodStart.AddMonths(1).AddDays(-1);
+        var startDateStr = periodStart.ToString("yyyy-MM-dd");
+        var endDateStr = periodEnd.ToString("yyyy-MM-dd");
+
+        await connection1.InvokeAsync("JoinScheduleGroup", startDateStr, endDateStr);
+        await connection2.InvokeAsync("JoinScheduleGroup", startDateStr, endDateStr);
+        await connection3.InvokeAsync("JoinScheduleGroup", startDateStr, endDateStr);
+
         // Act
         var workRequest = new
         {
             ClientId = _testClientId,
             ShiftId = _testShiftId,
             CurrentDate = DateTime.UtcNow.Date,
-            WorkTime = 8
+            WorkTime = 8,
+            PeriodStart = startDateStr,
+            PeriodEnd = endDateStr
         };
 
         _httpClient.DefaultRequestHeaders.Remove("Authorization");
