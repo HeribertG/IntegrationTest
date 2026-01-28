@@ -421,15 +421,13 @@ public class DeepLTranslationServiceTests
         var sortingService = Substitute.For<ICalendarRuleSortingService>();
         var paginationService = Substitute.For<ICalendarRulePaginationService>();
         var macroManagementService = Substitute.For<IMacroManagementService>();
-        var macroTypeManagementService = Substitute.For<IMacroTypeManagementService>();
 
         return new SettingsRepository(
             _context,
             filterService,
             sortingService,
             paginationService,
-            macroManagementService,
-            macroTypeManagementService
+            macroManagementService
         );
     }
 
