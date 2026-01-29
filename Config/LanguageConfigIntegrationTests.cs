@@ -3,6 +3,8 @@ using Klacks.Api.Domain.Common;
 using Klacks.Api.Presentation.Controllers.UserBackend;
 using Klacks.Api.Presentation.DTOs.Config;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using NSubstitute;
 using NUnit.Framework;
 
 namespace IntegrationTest.Config;
@@ -12,45 +14,21 @@ namespace IntegrationTest.Config;
 public class LanguageConfigIntegrationTests
 {
     [Test]
-    public void MultiLanguage_SupportedLanguages_ShouldContainAllExpectedLanguages()
+    public void MultiLanguage_CoreLanguages_ShouldContainAllExpectedLanguages()
     {
         // Act
-        var supportedLanguages = MultiLanguage.SupportedLanguages;
+        var coreLanguages = MultiLanguage.CoreLanguages;
 
         // Assert
-        supportedLanguages.Should().NotBeNull();
-        supportedLanguages.Should().HaveCount(4, "MultiLanguage should support exactly 4 languages");
-        supportedLanguages.Should().Contain("de", "German should be supported");
-        supportedLanguages.Should().Contain("en", "English should be supported");
-        supportedLanguages.Should().Contain("fr", "French should be supported");
-        supportedLanguages.Should().Contain("it", "Italian should be supported");
+        coreLanguages.Should().NotBeNull();
+        coreLanguages.Should().HaveCount(4, "MultiLanguage should support exactly 4 core languages");
+        coreLanguages.Should().Contain("de", "German should be supported");
+        coreLanguages.Should().Contain("en", "English should be supported");
+        coreLanguages.Should().Contain("fr", "French should be supported");
+        coreLanguages.Should().Contain("it", "Italian should be supported");
 
-        Console.WriteLine("=== MultiLanguage.SupportedLanguages Test ===");
-        Console.WriteLine($"Supported languages: [{string.Join(", ", supportedLanguages)}]");
-        Console.WriteLine("=== TEST PASSED ===");
-    }
-
-    [Test]
-    public void MultiLanguage_SupportedLanguages_ShouldBeDerivedFromProperties()
-    {
-        // Arrange
-        var multiLanguage = new MultiLanguage();
-        var propertyNames = typeof(MultiLanguage)
-            .GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)
-            .Where(p => p.PropertyType == typeof(string))
-            .Select(p => p.Name.ToLowerInvariant())
-            .ToArray();
-
-        // Act
-        var supportedLanguages = MultiLanguage.SupportedLanguages;
-
-        // Assert
-        supportedLanguages.Should().BeEquivalentTo(propertyNames,
-            "SupportedLanguages should match all string properties of MultiLanguage class");
-
-        Console.WriteLine("=== MultiLanguage Property Derivation Test ===");
-        Console.WriteLine($"Properties found: [{string.Join(", ", propertyNames)}]");
-        Console.WriteLine($"Supported languages: [{string.Join(", ", supportedLanguages)}]");
+        Console.WriteLine("=== MultiLanguage.CoreLanguages Test ===");
+        Console.WriteLine($"Core languages: [{string.Join(", ", coreLanguages)}]");
         Console.WriteLine("=== TEST PASSED ===");
     }
 
@@ -77,7 +55,7 @@ public class LanguageConfigIntegrationTests
     public void LanguageConfig_FallbackOrder_ShouldContainOnlySupportedLanguages()
     {
         // Arrange
-        var supportedLanguages = MultiLanguage.SupportedLanguages;
+        var supportedLanguages = LanguageConfig.SupportedLanguages;
 
         // Act
         var fallbackOrder = LanguageConfig.FallbackOrder;
@@ -100,7 +78,18 @@ public class LanguageConfigIntegrationTests
     public void LanguageConfigController_GetLanguages_ShouldReturnCorrectResponse()
     {
         // Arrange
-        var controller = new LanguageConfigController();
+        var configuration = Substitute.For<IConfiguration>();
+        var languagesSection = Substitute.For<IConfigurationSection>();
+        var supportedSection = Substitute.For<IConfigurationSection>();
+        var fallbackSection = Substitute.For<IConfigurationSection>();
+        var metadataSection = Substitute.For<IConfigurationSection>();
+
+        configuration.GetSection("Languages").Returns(languagesSection);
+        languagesSection.GetSection("Supported").Returns(supportedSection);
+        languagesSection.GetSection("FallbackOrder").Returns(fallbackSection);
+        languagesSection.GetSection("Metadata").Returns(metadataSection);
+
+        var controller = new LanguageConfigController(configuration);
 
         // Act
         var result = controller.GetLanguages();
@@ -115,7 +104,7 @@ public class LanguageConfigIntegrationTests
 
         var response = okResult.Value as LanguageConfigResponse;
         response.Should().NotBeNull();
-        response!.SupportedLanguages.Should().BeEquivalentTo(MultiLanguage.SupportedLanguages);
+        response!.SupportedLanguages.Should().BeEquivalentTo(LanguageConfig.SupportedLanguages);
         response.FallbackOrder.Should().BeEquivalentTo(LanguageConfig.FallbackOrder);
 
         Console.WriteLine("=== LanguageConfigController.GetLanguages Test ===");
@@ -131,12 +120,18 @@ public class LanguageConfigIntegrationTests
         var response = new LanguageConfigResponse
         {
             SupportedLanguages = ["de", "en", "fr", "it"],
-            FallbackOrder = ["de", "fr", "it", "en"]
+            FallbackOrder = ["de", "fr", "it", "en"],
+            Metadata = new Dictionary<string, LanguageMetadata>
+            {
+                ["de"] = new LanguageMetadata { Name = "German", DisplayName = "Deutsch", SpeechLocale = "de-CH" }
+            }
         };
 
         // Assert
         response.SupportedLanguages.Should().HaveCount(4);
         response.FallbackOrder.Should().HaveCount(4);
+        response.Metadata.Should().HaveCount(1);
+        response.Metadata["de"].DisplayName.Should().Be("Deutsch");
         response.SupportedLanguages.Should().NotBeSameAs(response.FallbackOrder,
             "SupportedLanguages and FallbackOrder should be independent arrays");
 
@@ -194,6 +189,25 @@ public class LanguageConfigIntegrationTests
     }
 
     [Test]
+    public void MultiLanguage_SetValue_ShouldSupportDynamicLanguages()
+    {
+        // Arrange
+        var multiLanguage = new MultiLanguage();
+
+        // Act
+        multiLanguage.SetValue("es", "Hola");
+        multiLanguage.SetValue("pt", "Olá");
+
+        // Assert
+        multiLanguage.GetValue("es").Should().Be("Hola");
+        multiLanguage.GetValue("pt").Should().Be("Olá");
+
+        Console.WriteLine("=== MultiLanguage Dynamic Languages Test ===");
+        Console.WriteLine("Dynamic language values set and retrieved correctly.");
+        Console.WriteLine("=== TEST PASSED ===");
+    }
+
+    [Test]
     public void MultiLanguage_IsEmpty_ShouldReturnTrueWhenAllValuesAreNull()
     {
         // Arrange
@@ -241,6 +255,31 @@ public class LanguageConfigIntegrationTests
 
         Console.WriteLine("=== MultiLanguage.ToDictionary Test ===");
         Console.WriteLine($"Dictionary keys: [{string.Join(", ", dictionary.Keys)}]");
+        Console.WriteLine("=== TEST PASSED ===");
+    }
+
+    [Test]
+    public void MultiLanguage_GetPopulatedLanguages_ShouldReturnOnlyPopulatedKeys()
+    {
+        // Arrange
+        var multiLanguage = new MultiLanguage
+        {
+            De = "Deutsch",
+            Fr = "Français"
+        };
+        multiLanguage.SetValue("es", "Español");
+
+        // Act
+        var populatedLanguages = multiLanguage.GetPopulatedLanguages().ToList();
+
+        // Assert
+        populatedLanguages.Should().HaveCount(3);
+        populatedLanguages.Should().Contain("de");
+        populatedLanguages.Should().Contain("fr");
+        populatedLanguages.Should().Contain("es");
+
+        Console.WriteLine("=== MultiLanguage.GetPopulatedLanguages Test ===");
+        Console.WriteLine($"Populated languages: [{string.Join(", ", populatedLanguages)}]");
         Console.WriteLine("=== TEST PASSED ===");
     }
 }
