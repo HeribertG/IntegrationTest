@@ -302,7 +302,7 @@ OUTPUT 1, Round(TotalBonus, 2)",
         await _context.SaveChangesAsync();
     }
 
-    private BulkWorkItem CreateWorkItem(DateTime date)
+    private BulkWorkItem CreateWorkItem(DateOnly date)
     {
         return new BulkWorkItem
         {
@@ -319,7 +319,7 @@ OUTPUT 1, Round(TotalBonus, 2)",
     public async Task BulkAddWorks_Saturday_ShouldReturnCorrectPeriodHours()
     {
         // Arrange
-        var saturday = new DateTime(2025, 1, 18, 0, 0, 0, DateTimeKind.Utc);
+        var saturday = new DateOnly(2025, 1, 18);
 
         var request = new BulkAddWorksRequest
         {
@@ -348,7 +348,7 @@ OUTPUT 1, Round(TotalBonus, 2)",
     public async Task BulkAddWorks_Sunday_ShouldReturnCorrectPeriodHours()
     {
         // Arrange
-        var sunday = new DateTime(2025, 1, 19, 0, 0, 0, DateTimeKind.Utc);
+        var sunday = new DateOnly(2025, 1, 19);
 
         var request = new BulkAddWorksRequest
         {
@@ -376,7 +376,7 @@ OUTPUT 1, Round(TotalBonus, 2)",
     public async Task BulkAddWorks_Monday_ShouldReturnCorrectPeriodHours()
     {
         // Arrange
-        var monday = new DateTime(2025, 1, 20, 0, 0, 0, DateTimeKind.Utc);
+        var monday = new DateOnly(2025, 1, 20);
 
         var request = new BulkAddWorksRequest
         {
@@ -404,9 +404,9 @@ OUTPUT 1, Round(TotalBonus, 2)",
     public async Task BulkAddWorks_SaturdaySundayMonday_ShouldReturnCorrectPeriodHours()
     {
         // Arrange
-        var saturday = new DateTime(2025, 1, 18, 0, 0, 0, DateTimeKind.Utc);
-        var sunday = new DateTime(2025, 1, 19, 0, 0, 0, DateTimeKind.Utc);
-        var monday = new DateTime(2025, 1, 20, 0, 0, 0, DateTimeKind.Utc);
+        var saturday = new DateOnly(2025, 1, 18);
+        var sunday = new DateOnly(2025, 1, 19);
+        var monday = new DateOnly(2025, 1, 20);
 
         var request = new BulkAddWorksRequest
         {
@@ -441,7 +441,7 @@ OUTPUT 1, Round(TotalBonus, 2)",
     public async Task BulkAddWorks_Holiday_ShouldReturnCorrectPeriodHours()
     {
         // Arrange
-        var newYear = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        var newYear = new DateOnly(2025, 1, 1);
 
         var mockMacroData = new MacroData
         {

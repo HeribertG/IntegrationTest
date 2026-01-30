@@ -241,7 +241,7 @@ public class WorkNotificationHubTests
         {
             ClientId = _testClientId,
             ShiftId = _testShiftId,
-            CurrentDate = DateTime.UtcNow.Date,
+            CurrentDate = DateOnly.FromDateTime(DateTime.UtcNow),
             WorkTime = 8,
             PeriodStart = startDateStr,
             PeriodEnd = endDateStr
@@ -279,7 +279,7 @@ public class WorkNotificationHubTests
             Id = workId,
             ClientId = _testClientId,
             ShiftId = _testShiftId,
-            CurrentDate = DateTime.UtcNow.Date,
+            CurrentDate = DateOnly.FromDateTime(DateTime.UtcNow),
             WorkTime = 8,
             IsSealed = false,
             IsDeleted = false
@@ -379,7 +379,7 @@ public class WorkNotificationHubTests
         {
             ClientId = _testClientId,
             ShiftId = _testShiftId,
-            CurrentDate = DateTime.UtcNow.Date,
+            CurrentDate = DateOnly.FromDateTime(DateTime.UtcNow),
             WorkTime = 8,
             PeriodStart = startDateStr,
             PeriodEnd = endDateStr

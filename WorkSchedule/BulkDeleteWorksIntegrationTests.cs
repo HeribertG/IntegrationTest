@@ -124,8 +124,8 @@ public class BulkDeleteWorksIntegrationTests
         await _context.SaveChangesAsync();
 
         // Create works with surcharges: 3 weekdays, 1 Saturday, 1 Sunday
-        var saturday = new DateTime(2025, 1, 18, 0, 0, 0, DateTimeKind.Utc); // Saturday
-        var sunday = new DateTime(2025, 1, 19, 0, 0, 0, DateTimeKind.Utc);   // Sunday
+        var saturday = new DateOnly(2025, 1, 18); // Saturday
+        var sunday = new DateOnly(2025, 1, 19);   // Sunday
 
         // Saturday work: 8 hours with 10% surcharge = 0.8
         var saturdayWork = new Work
@@ -167,7 +167,7 @@ public class BulkDeleteWorksIntegrationTests
             Id = Guid.NewGuid(),
             ClientId = _testClientId,
             ShiftId = _testShiftId,
-            CurrentDate = new DateTime(2025, 1, 20, 0, 0, 0, DateTimeKind.Utc),
+            CurrentDate = new DateOnly(2025, 1, 20),
             WorkTime = 8,
             Surcharges = 0m,
             StartTime = new TimeOnly(8, 0, 0),

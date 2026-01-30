@@ -90,7 +90,7 @@ public class GetWorkScheduleTests
             Id = _testWorkId,
             ClientId = _testClientId,
             ShiftId = _testShiftId,
-            CurrentDate = new DateTime(2025, 1, 15, 0, 0, 0, DateTimeKind.Utc),
+            CurrentDate = new DateOnly(2025, 1, 15),
             WorkTime = 480,
             StartTime = new TimeOnly(8, 0, 0),
             EndTime = new TimeOnly(16, 0, 0),
