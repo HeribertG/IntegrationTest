@@ -13,7 +13,7 @@ using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NUnit.Framework;
 
-namespace IntegrationTest.Translation;
+namespace Klacks.IntegrationTest.Translation;
 
 [TestFixture]
 [Category("RealDatabase")]

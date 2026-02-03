@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using NSubstitute;
 using NUnit.Framework;
 
-namespace IntegrationTest.Clients;
+namespace Klacks.IntegrationTest.Clients;
 
 /// <summary>
 /// Integration tests for Client creation with all related tables.

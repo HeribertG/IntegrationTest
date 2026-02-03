@@ -14,7 +14,7 @@ using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NUnit.Framework;
 
-namespace IntegrationTest.Groups;
+namespace Klacks.IntegrationTest.Groups;
 
 /// <summary>
 /// Integration tests for Group nested set tree operations.

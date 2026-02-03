@@ -20,7 +20,7 @@ using System.Net.Http.Json;
 using System.Security.Claims;
 using System.Text;
 
-namespace IntegrationTest.SignalR;
+namespace Klacks.IntegrationTest.SignalR;
 
 public class SignalRTestWebApplicationFactory : WebApplicationFactory<Program>
 {

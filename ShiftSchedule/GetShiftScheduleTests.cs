@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NUnit.Framework;
 
-namespace IntegrationTest.ShiftSchedule;
+namespace Klacks.IntegrationTest.ShiftSchedule;
 
 [TestFixture]
 public class GetShiftScheduleTests

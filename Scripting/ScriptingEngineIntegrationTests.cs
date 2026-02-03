@@ -2,7 +2,7 @@ using FluentAssertions;
 using Klacks.Api.Infrastructure.Scripting;
 using NUnit.Framework;
 
-namespace IntegrationTest.Scripting;
+namespace Klacks.IntegrationTest.Scripting;
 
 [TestFixture]
 public class ScriptingEngineIntegrationTests

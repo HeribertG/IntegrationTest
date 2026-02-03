@@ -7,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 using NSubstitute;
 using NUnit.Framework;
 
-namespace IntegrationTest.Config;
+namespace Klacks.IntegrationTest.Config;
 
 [TestFixture]
 [Category("Config")]

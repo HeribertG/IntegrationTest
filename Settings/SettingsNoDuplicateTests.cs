@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NUnit.Framework;
 
-namespace IntegrationTest.Settings;
+namespace Klacks.IntegrationTest.Settings;
 
 [TestFixture]
 [Category("RealDatabase")]

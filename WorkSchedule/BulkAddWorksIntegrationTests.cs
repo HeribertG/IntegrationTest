@@ -27,7 +27,7 @@ using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NUnit.Framework;
 
-namespace IntegrationTest.WorkSchedule;
+namespace Klacks.IntegrationTest.WorkSchedule;
 
 [TestFixture]
 public class BulkAddWorksIntegrationTests

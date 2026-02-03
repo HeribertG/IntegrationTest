@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.DataProtection;
 using NUnit.Framework;
 
-namespace IntegrationTest.Translation;
+namespace Klacks.IntegrationTest.Translation;
 
 [TestFixture]
 [Category("Debug")]

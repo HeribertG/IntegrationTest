@@ -19,7 +19,7 @@ using NSubstitute;
 using NUnit.Framework;
 using Shift = Klacks.Api.Domain.Models.Schedules.Shift;
 
-namespace IntegrationTest.Shifts;
+namespace Klacks.IntegrationTest.Shifts;
 
 [TestFixture]
 [Category("RealDatabase")]
