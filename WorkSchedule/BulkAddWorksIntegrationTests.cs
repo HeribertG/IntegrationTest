@@ -125,6 +125,7 @@ public class BulkAddWorksIntegrationTests
             shiftScheduleService,
             periodHoursService,
             mockHttpContextAccessor,
+            Substitute.For<IScheduleChangeTracker>(),
             Substitute.For<ILogger<BulkAddWorksCommandHandler>>());
 
         await SetupTestData();
@@ -553,6 +554,7 @@ OUTPUT 1, Round(TotalBonus, 2)",
             shiftScheduleService,
             periodHoursService,
             mockHttpContextAccessor,
+            Substitute.For<IScheduleChangeTracker>(),
             Substitute.For<ILogger<BulkAddWorksCommandHandler>>());
     }
 }
