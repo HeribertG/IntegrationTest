@@ -86,6 +86,7 @@ public class BulkDeleteWorksIntegrationTests
             shiftScheduleService,
             periodHoursService,
             mockHttpContextAccessor,
+            Substitute.For<IScheduleChangeTracker>(),
             Substitute.For<ILogger<BulkDeleteWorksCommandHandler>>());
 
         await SetupTestData();
