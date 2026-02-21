@@ -71,6 +71,10 @@ public class BulkDeleteWorksIntegrationTests
             Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(new List<ShiftDayAssignment>()));
 
+        var completionService = Substitute.For<IScheduleCompletionService>();
+        completionService.SaveBulkAndTrackAsync(Arg.Any<List<(Guid, DateOnly)>>())
+            .Returns(callInfo => _context.SaveChangesAsync());
+
         _handler = new BulkDeleteWorksCommandHandler(
             workRepository,
             scheduleMapper,
@@ -78,7 +82,7 @@ public class BulkDeleteWorksIntegrationTests
             shiftStatsNotificationService,
             shiftScheduleService,
             periodHoursService,
-            Substitute.For<IScheduleCompletionService>(),
+            completionService,
             mockHttpContextAccessor,
             Substitute.For<ILogger<BulkDeleteWorksCommandHandler>>());
 

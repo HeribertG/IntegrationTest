@@ -109,6 +109,10 @@ public class BulkAddWorksIntegrationTests
             Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(new List<ShiftDayAssignment>()));
 
+        var completionService = Substitute.For<IScheduleCompletionService>();
+        completionService.SaveBulkAndTrackAsync(Arg.Any<List<(Guid, DateOnly)>>())
+            .Returns(callInfo => _context.SaveChangesAsync());
+
         _handler = new BulkAddWorksCommandHandler(
             workRepository,
             scheduleMapper,
@@ -116,7 +120,7 @@ public class BulkAddWorksIntegrationTests
             shiftStatsNotificationService,
             shiftScheduleService,
             periodHoursService,
-            Substitute.For<IScheduleCompletionService>(),
+            completionService,
             mockHttpContextAccessor,
             Substitute.For<ILogger<BulkAddWorksCommandHandler>>());
 
@@ -531,6 +535,10 @@ OUTPUT 1, Round(TotalBonus, 2)",
             Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(new List<ShiftDayAssignment>()));
 
+        var completionService = Substitute.For<IScheduleCompletionService>();
+        completionService.SaveBulkAndTrackAsync(Arg.Any<List<(Guid, DateOnly)>>())
+            .Returns(callInfo => _context.SaveChangesAsync());
+
         return new BulkAddWorksCommandHandler(
             workRepository,
             scheduleMapper,
@@ -538,7 +546,7 @@ OUTPUT 1, Round(TotalBonus, 2)",
             shiftStatsNotificationService,
             shiftScheduleService,
             periodHoursService,
-            Substitute.For<IScheduleCompletionService>(),
+            completionService,
             mockHttpContextAccessor,
             Substitute.For<ILogger<BulkAddWorksCommandHandler>>());
     }
