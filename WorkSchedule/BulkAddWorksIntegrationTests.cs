@@ -16,7 +16,6 @@ using Klacks.Api.Domain.Services.PeriodHours;
 using Klacks.Api.Domain.Services.Schedules;
 using Klacks.Api.Domain.Services.Settings;
 using Klacks.Api.Infrastructure.Hubs;
-using Klacks.Api.Infrastructure.Interfaces;
 using Klacks.Api.Infrastructure.Scripting;
 using Klacks.Api.Infrastructure.Persistence;
 using Klacks.Api.Infrastructure.Repositories;
@@ -61,9 +60,6 @@ public class BulkAddWorksIntegrationTests
         var mockHttpContextAccessor = Substitute.For<IHttpContextAccessor>();
         _context = new DataBaseContext(options, mockHttpContextAccessor);
 
-        var unitOfWork = Substitute.For<IUnitOfWork>();
-        unitOfWork.CompleteAsync().Returns(Task.FromResult(1));
-
         var workNotificationService = Substitute.For<IWorkNotificationService>();
         var periodHoursService = new PeriodHoursService(
             _context,
@@ -101,12 +97,9 @@ public class BulkAddWorksIntegrationTests
         var workRepository = new WorkRepository(
             _context,
             Substitute.For<ILogger<Work>>(),
-            unitOfWork,
             Substitute.For<IClientGroupFilterService>(),
             Substitute.For<IClientSearchFilterService>(),
-            workMacroService,
-            periodHoursService,
-            mockHttpContextAccessor);
+            workMacroService);
 
         var scheduleMapper = new ScheduleMapper();
         var shiftStatsNotificationService = Substitute.For<IShiftStatsNotificationService>();
@@ -119,13 +112,12 @@ public class BulkAddWorksIntegrationTests
         _handler = new BulkAddWorksCommandHandler(
             workRepository,
             scheduleMapper,
-            unitOfWork,
             workNotificationService,
             shiftStatsNotificationService,
             shiftScheduleService,
             periodHoursService,
+            Substitute.For<IScheduleCompletionService>(),
             mockHttpContextAccessor,
-            Substitute.For<IScheduleChangeTracker>(),
             Substitute.For<ILogger<BulkAddWorksCommandHandler>>());
 
         await SetupTestData();
@@ -493,9 +485,6 @@ OUTPUT 1, Round(TotalBonus, 2)",
 
     private BulkAddWorksCommandHandler CreateHandlerWithMockedMacroDataProvider(IMacroDataProvider macroDataProvider)
     {
-        var unitOfWork = Substitute.For<IUnitOfWork>();
-        unitOfWork.CompleteAsync().Returns(Task.FromResult(1));
-
         var workNotificationService = Substitute.For<IWorkNotificationService>();
         var periodHoursService = new PeriodHoursService(
             _context,
@@ -530,12 +519,9 @@ OUTPUT 1, Round(TotalBonus, 2)",
         var workRepository = new WorkRepository(
             _context,
             Substitute.For<ILogger<Work>>(),
-            unitOfWork,
             Substitute.For<IClientGroupFilterService>(),
             Substitute.For<IClientSearchFilterService>(),
-            workMacroService,
-            periodHoursService,
-            mockHttpContextAccessor);
+            workMacroService);
 
         var scheduleMapper = new ScheduleMapper();
         var shiftStatsNotificationService = Substitute.For<IShiftStatsNotificationService>();
@@ -548,13 +534,12 @@ OUTPUT 1, Round(TotalBonus, 2)",
         return new BulkAddWorksCommandHandler(
             workRepository,
             scheduleMapper,
-            unitOfWork,
             workNotificationService,
             shiftStatsNotificationService,
             shiftScheduleService,
             periodHoursService,
+            Substitute.For<IScheduleCompletionService>(),
             mockHttpContextAccessor,
-            Substitute.For<IScheduleChangeTracker>(),
             Substitute.For<ILogger<BulkAddWorksCommandHandler>>());
     }
 }

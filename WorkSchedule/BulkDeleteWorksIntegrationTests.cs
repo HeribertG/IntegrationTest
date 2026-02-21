@@ -50,9 +50,6 @@ public class BulkDeleteWorksIntegrationTests
         var mockHttpContextAccessor = Substitute.For<IHttpContextAccessor>();
         _context = new DataBaseContext(options, mockHttpContextAccessor);
 
-        var unitOfWork = Substitute.For<IUnitOfWork>();
-        unitOfWork.CompleteAsync().Returns(Task.FromResult(1));
-
         var workNotificationService = Substitute.For<IWorkNotificationService>();
         var periodHoursService = new PeriodHoursService(
             _context,
@@ -62,12 +59,9 @@ public class BulkDeleteWorksIntegrationTests
         var workRepository = new WorkRepository(
             _context,
             Substitute.For<ILogger<Work>>(),
-            unitOfWork,
             Substitute.For<IClientGroupFilterService>(),
             Substitute.For<IClientSearchFilterService>(),
-            Substitute.For<IWorkMacroService>(),
-            periodHoursService,
-            mockHttpContextAccessor);
+            Substitute.For<IWorkMacroService>());
 
         var scheduleMapper = new ScheduleMapper();
         var shiftStatsNotificationService = Substitute.For<IShiftStatsNotificationService>();
@@ -80,13 +74,12 @@ public class BulkDeleteWorksIntegrationTests
         _handler = new BulkDeleteWorksCommandHandler(
             workRepository,
             scheduleMapper,
-            unitOfWork,
             workNotificationService,
             shiftStatsNotificationService,
             shiftScheduleService,
             periodHoursService,
+            Substitute.For<IScheduleCompletionService>(),
             mockHttpContextAccessor,
-            Substitute.For<IScheduleChangeTracker>(),
             Substitute.For<ILogger<BulkDeleteWorksCommandHandler>>());
 
         await SetupTestData();
