@@ -3,6 +3,7 @@ using Klacks.Api.Application.Interfaces;
 using Klacks.Api.Domain.Interfaces;
 using Klacks.Api.Domain.Models.Associations;
 using Klacks.Api.Domain.Services.Groups;
+using Klacks.Api.Infrastructure.Services.Groups;
 using Klacks.Api.Infrastructure.Interfaces;
 using Klacks.Api.Infrastructure.Persistence;
 using Klacks.Api.Infrastructure.Persistence.Adapters;
@@ -95,7 +96,7 @@ public class GroupNestedSetIntegrationTests
         var validityService = new GroupValidityService(_context, validityServiceLogger);
 
         var searchServiceLogger = Substitute.For<ILogger<GroupSearchService>>();
-        var searchService = new GroupSearchService(_context, searchServiceLogger, validityService);
+        var searchService = new GroupSearchService(searchServiceLogger, validityService);
 
         var membershipServiceLogger = Substitute.For<ILogger<GroupMembershipService>>();
         var membershipService = new GroupMembershipService(_context, membershipServiceLogger, _hierarchyService);

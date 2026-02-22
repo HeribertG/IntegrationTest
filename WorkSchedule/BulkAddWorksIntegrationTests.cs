@@ -12,9 +12,10 @@ using Klacks.Api.Domain.Models.Schedules;
 using Klacks.Api.Domain.Models.Settings;
 using Klacks.Api.Domain.Models.Staffs;
 using Klacks.Api.Domain.Services.Common;
-using Klacks.Api.Domain.Services.Macros;
-using Klacks.Api.Domain.Services.PeriodHours;
-using Klacks.Api.Domain.Services.Schedules;
+using Klacks.Api.Infrastructure.Services.Macros;
+using Klacks.Api.Infrastructure.Services.PeriodHours;
+using Klacks.Api.Infrastructure.Services.Settings;
+using Klacks.Api.Infrastructure.Services.Schedules;
 using Klacks.Api.Domain.Services.Settings;
 using Klacks.Api.Infrastructure.Hubs;
 using Klacks.Api.Infrastructure.Scripting;
@@ -87,12 +88,12 @@ public class BulkAddWorksIntegrationTests
         var macroEngine = new MacroEngine();
 
         var workMacroService = new WorkMacroService(
+            _context,
             shiftRepository,
             macroManagementService,
             macroCache,
             macroDataProvider,
             macroEngine,
-            _context,
             Substitute.For<ILogger<WorkMacroService>>());
 
         var workRepository = new WorkRepository(
@@ -511,12 +512,12 @@ OUTPUT 1, Round(TotalBonus, 2)",
         var macroEngine = new MacroEngine();
 
         var workMacroService = new WorkMacroService(
+            _context,
             shiftRepository,
             macroManagementService,
             macroCache,
             macroDataProvider,
             macroEngine,
-            _context,
             Substitute.For<ILogger<WorkMacroService>>());
 
         var mockHttpContextAccessor = Substitute.For<IHttpContextAccessor>();

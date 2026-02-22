@@ -7,7 +7,7 @@ using Klacks.Api.Application.Mappers;
 using Klacks.Api.Domain.Interfaces;
 using Klacks.Api.Domain.Models.Schedules;
 using Klacks.Api.Domain.Services.Common;
-using Klacks.Api.Domain.Services.PeriodHours;
+using Klacks.Api.Infrastructure.Services.PeriodHours;
 using Klacks.Api.Infrastructure.Hubs;
 using Klacks.Api.Infrastructure.Persistence;
 using Klacks.Api.Infrastructure.Repositories;
