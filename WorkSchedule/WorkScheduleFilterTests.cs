@@ -1,5 +1,4 @@
 using FluentAssertions;
-using Klacks.Api.Application.Interfaces;
 using Klacks.Api.Domain.Enums;
 using Klacks.Api.Domain.Interfaces;
 using Klacks.Api.Domain.Models.Associations;
@@ -7,10 +6,7 @@ using Klacks.Api.Domain.Models.Schedules;
 using Klacks.Api.Domain.Models.Staffs;
 using Klacks.Api.Domain.Services.Common;
 using Klacks.Api.Infrastructure.Persistence;
-using Klacks.Api.Infrastructure.Repositories;
-using Klacks.Api.Infrastructure.Repositories.Associations;
 using Klacks.Api.Infrastructure.Repositories.Schedules;
-using Klacks.Api.Infrastructure.Repositories.Settings;
 using Klacks.Api.Domain.Models.Filters;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -200,7 +196,7 @@ public class WorkScheduleFilterTests
         var mockPeriodHoursService = Substitute.For<IPeriodHoursService>();
         var mockHttpContextAccessor = Substitute.For<IHttpContextAccessor>();
         var mockUnitOfWork = Substitute.For<IUnitOfWork>();
-        var repository = new WorkRepository(_context, mockLogger, mockUnitOfWork, mockGroupFilter, mockSearchFilter, mockWorkMacroService, mockPeriodHoursService, mockHttpContextAccessor);
+        var repository = new WorkRepository(_context, mockLogger, mockGroupFilter, mockSearchFilter, mockWorkMacroService);
 
         var now = DateTime.UtcNow;
         var startDate = new DateOnly(now.Year, now.Month, 1).AddDays(-5);
@@ -238,10 +234,7 @@ public class WorkScheduleFilterTests
 
         var mockLogger = Substitute.For<ILogger<Work>>();
         var mockWorkMacroService = Substitute.For<IWorkMacroService>();
-        var mockPeriodHoursService = Substitute.For<IPeriodHoursService>();
-        var mockHttpContextAccessor = Substitute.For<IHttpContextAccessor>();
-        var mockUnitOfWork = Substitute.For<IUnitOfWork>();
-        var repository = new WorkRepository(_context, mockLogger, mockUnitOfWork, mockGroupFilter, mockSearchFilter, mockWorkMacroService, mockPeriodHoursService, mockHttpContextAccessor);
+        var repository = new WorkRepository(_context, mockLogger, mockGroupFilter, mockSearchFilter, mockWorkMacroService);
 
         var now = DateTime.UtcNow;
         var startDate = new DateOnly(now.Year, now.Month, 1).AddDays(-5);
@@ -280,10 +273,7 @@ public class WorkScheduleFilterTests
 
         var mockLogger = Substitute.For<ILogger<Work>>();
         var mockWorkMacroService = Substitute.For<IWorkMacroService>();
-        var mockPeriodHoursService = Substitute.For<IPeriodHoursService>();
-        var mockHttpContextAccessor = Substitute.For<IHttpContextAccessor>();
-        var mockUnitOfWork = Substitute.For<IUnitOfWork>();
-        var repository = new WorkRepository(_context, mockLogger, mockUnitOfWork, mockGroupFilter, mockSearchFilter, mockWorkMacroService, mockPeriodHoursService, mockHttpContextAccessor);
+        var repository = new WorkRepository(_context, mockLogger, mockGroupFilter, mockSearchFilter, mockWorkMacroService);
 
         var now = DateTime.UtcNow;
         var startDate = new DateOnly(now.Year, now.Month, 1).AddDays(-5);
@@ -320,10 +310,7 @@ public class WorkScheduleFilterTests
 
         var mockLogger = Substitute.For<ILogger<Work>>();
         var mockWorkMacroService = Substitute.For<IWorkMacroService>();
-        var mockPeriodHoursService = Substitute.For<IPeriodHoursService>();
-        var mockHttpContextAccessor = Substitute.For<IHttpContextAccessor>();
-        var mockUnitOfWork = Substitute.For<IUnitOfWork>();
-        var repository = new WorkRepository(_context, mockLogger, mockUnitOfWork, mockGroupFilter, mockSearchFilter, mockWorkMacroService, mockPeriodHoursService, mockHttpContextAccessor);
+        var repository = new WorkRepository(_context, mockLogger, mockGroupFilter, mockSearchFilter, mockWorkMacroService);
 
         var now = DateTime.UtcNow;
         var startDate = new DateOnly(now.Year, now.Month, 1).AddDays(-5);
@@ -363,10 +350,7 @@ public class WorkScheduleFilterTests
 
         var mockLogger = Substitute.For<ILogger<Work>>();
         var mockWorkMacroService = Substitute.For<IWorkMacroService>();
-        var mockPeriodHoursService = Substitute.For<IPeriodHoursService>();
-        var mockHttpContextAccessor = Substitute.For<IHttpContextAccessor>();
-        var mockUnitOfWork = Substitute.For<IUnitOfWork>();
-        var repository = new WorkRepository(_context, mockLogger, mockUnitOfWork, mockGroupFilter, mockSearchFilter, mockWorkMacroService, mockPeriodHoursService, mockHttpContextAccessor);
+        var repository = new WorkRepository(_context, mockLogger, mockGroupFilter, mockSearchFilter, mockWorkMacroService);
 
         var now = DateTime.UtcNow;
         var startDate = new DateOnly(now.Year, now.Month, 1).AddDays(-5);

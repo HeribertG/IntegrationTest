@@ -1,7 +1,7 @@
 using FluentAssertions;
 using Klacks.Api.Domain.Interfaces;
 using Klacks.Api.Domain.Models.Schedules;
-using Klacks.Api.Domain.Services.ScheduleEntries;
+using Klacks.Api.Infrastructure.Services.ScheduleEntries;
 using Klacks.Api.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;

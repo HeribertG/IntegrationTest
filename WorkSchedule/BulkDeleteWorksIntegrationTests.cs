@@ -1,12 +1,12 @@
 using FluentAssertions;
-using Klacks.Api.Application.Commands;
+using Klacks.Api.Application.Commands.Works;
 using Klacks.Api.Application.Handlers.Works;
 using Klacks.Api.Application.Interfaces;
 using Klacks.Api.Application.Mappers;
 using Klacks.Api.Domain.Interfaces;
 using Klacks.Api.Domain.Models.Schedules;
 using Klacks.Api.Domain.Services.Common;
-using Klacks.Api.Domain.Services.PeriodHours;
+using Klacks.Api.Infrastructure.Services.PeriodHours;
 using Klacks.Api.Infrastructure.Hubs;
 using Klacks.Api.Infrastructure.Persistence;
 using Klacks.Api.Infrastructure.Repositories;
@@ -50,24 +50,19 @@ public class BulkDeleteWorksIntegrationTests
         var mockHttpContextAccessor = Substitute.For<IHttpContextAccessor>();
         _context = new DataBaseContext(options, mockHttpContextAccessor);
 
-        var unitOfWork = Substitute.For<IUnitOfWork>();
-        unitOfWork.CompleteAsync().Returns(Task.FromResult(1));
-
         var workNotificationService = Substitute.For<IWorkNotificationService>();
         var periodHoursService = new PeriodHoursService(
             _context,
             Substitute.For<ILogger<PeriodHoursService>>(),
-            workNotificationService);
+            workNotificationService,
+            Substitute.For<IClientGroupFilterService>());
 
         var workRepository = new WorkRepository(
             _context,
             Substitute.For<ILogger<Work>>(),
-            unitOfWork,
             Substitute.For<IClientGroupFilterService>(),
             Substitute.For<IClientSearchFilterService>(),
-            Substitute.For<IWorkMacroService>(),
-            periodHoursService,
-            mockHttpContextAccessor);
+            Substitute.For<IWorkMacroService>());
 
         var scheduleMapper = new ScheduleMapper();
         var shiftStatsNotificationService = Substitute.For<IShiftStatsNotificationService>();
@@ -77,14 +72,18 @@ public class BulkDeleteWorksIntegrationTests
             Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(new List<ShiftDayAssignment>()));
 
+        var completionService = Substitute.For<IScheduleCompletionService>();
+        completionService.SaveBulkAndTrackAsync(Arg.Any<List<(Guid, DateOnly)>>())
+            .Returns(async callInfo => { await _context.SaveChangesAsync(); });
+
         _handler = new BulkDeleteWorksCommandHandler(
             workRepository,
             scheduleMapper,
-            unitOfWork,
             workNotificationService,
             shiftStatsNotificationService,
             shiftScheduleService,
             periodHoursService,
+            completionService,
             mockHttpContextAccessor,
             Substitute.For<ILogger<BulkDeleteWorksCommandHandler>>());
 

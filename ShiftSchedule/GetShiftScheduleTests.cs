@@ -2,7 +2,7 @@ using FluentAssertions;
 using Klacks.Api.Domain.Enums;
 using Klacks.Api.Domain.Models.Associations;
 using Klacks.Api.Domain.Models.Schedules;
-using Klacks.Api.Domain.Services.ShiftSchedule;
+using Klacks.Api.Infrastructure.Services.ShiftSchedule;
 using Klacks.Api.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;

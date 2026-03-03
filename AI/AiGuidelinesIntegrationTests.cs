@@ -1,9 +1,8 @@
 using FluentAssertions;
 using Klacks.Api.Application.Skills;
-using Klacks.Api.Domain.Models.AI;
-using Klacks.Api.Domain.Models.Skills;
+using Klacks.Api.Domain.Models.Assistant;
 using Klacks.Api.Infrastructure.Persistence;
-using Klacks.Api.Infrastructure.Repositories.AI;
+using Klacks.Api.Infrastructure.Repositories.Assistant;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using NSubstitute;
