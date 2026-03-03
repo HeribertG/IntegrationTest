@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Klacks.Api.Domain.Common;
+using Klacks.Api.Domain.Interfaces.Settings;
 using Klacks.Api.Presentation.Controllers.UserBackend;
 using Klacks.Api.Application.DTOs.Config;
 using Microsoft.AspNetCore.Mvc;
@@ -89,7 +90,9 @@ public class LanguageConfigIntegrationTests
         languagesSection.GetSection("FallbackOrder").Returns(fallbackSection);
         languagesSection.GetSection("Metadata").Returns(metadataSection);
 
-        var controller = new LanguageConfigController(configuration);
+        var languagePluginService = Substitute.For<ILanguagePluginService>();
+        languagePluginService.GetInstalledPluginCodes().Returns(new List<string>());
+        var controller = new LanguageConfigController(configuration, languagePluginService);
 
         // Act
         var result = controller.GetLanguages();
