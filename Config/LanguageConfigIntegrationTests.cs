@@ -92,7 +92,8 @@ public class LanguageConfigIntegrationTests
 
         var languagePluginService = Substitute.For<ILanguagePluginService>();
         languagePluginService.GetInstalledPluginCodes().Returns(new List<string>());
-        var controller = new LanguageConfigController(configuration, languagePluginService);
+        var marketplaceClient = Substitute.For<IMarketplaceClientService>();
+        var controller = new LanguageConfigController(configuration, languagePluginService, marketplaceClient);
 
         // Act
         var result = controller.GetLanguages();
