@@ -94,13 +94,13 @@ public class DeepLTranslationServiceTests
     }
 
     [Test]
-    public void IsConfigured_WhenApiKeyExists_ShouldReturnTrue()
+    public async Task IsConfigured_WhenApiKeyExists_ShouldReturnTrue()
     {
         // Arrange
         // API Key should be configured in DB
 
         // Act
-        var isConfigured = _translationService.IsConfigured;
+        var isConfigured = await _translationService.IsConfiguredAsync();
 
         // Assert
         isConfigured.Should().BeTrue("DeepL API key should be configured in the database");
