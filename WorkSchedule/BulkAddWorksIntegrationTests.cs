@@ -6,6 +6,7 @@ using Klacks.Api.Application.Mappers;
 using Klacks.Api.Domain.Common;
 using Klacks.Api.Domain.Interfaces;
 using Klacks.Api.Domain.Interfaces.Associations;
+using Klacks.Api.Domain.Interfaces.Schedules;
 using Klacks.Api.Domain.Models.Associations;
 using Klacks.Api.Infrastructure.Interfaces;
 using Klacks.Api.Domain.Models.Macros;
@@ -129,6 +130,7 @@ public class BulkAddWorksIntegrationTests
             periodHoursService,
             completionService,
             notificationFacade,
+            Substitute.For<IContainerWorkExpansionService>(),
             Substitute.For<ILogger<BulkAddWorksCommandHandler>>());
 
         await SetupTestData();
@@ -557,6 +559,7 @@ OUTPUT 1, Round(TotalBonus, 2)",
             periodHoursService,
             completionService,
             notificationFacade,
+            Substitute.For<IContainerWorkExpansionService>(),
             Substitute.For<ILogger<BulkAddWorksCommandHandler>>());
     }
 
