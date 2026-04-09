@@ -1,0 +1,22 @@
+[
+  { "query": "zeig offene Schichten", "expectedSourceId": "list_open_shifts" },
+  { "query": "show open shifts", "expectedSourceId": "list_open_shifts" },
+  { "query": "neuen Mitarbeiter anlegen", "expectedSourceId": "create_employee" },
+  { "query": "create a new employee", "expectedSourceId": "create_employee" },
+  { "query": "Schicht erstellen", "expectedSourceId": "create_shift" },
+  { "query": "create a shift", "expectedSourceId": "create_shift" },
+  { "query": "Benutzer anlegen", "expectedSourceId": "create_user" },
+  { "query": "create user account", "expectedSourceId": "create_user" },
+  { "query": "aktuelle Uhrzeit", "expectedSourceId": "get_current_time" },
+  { "query": "what time is it", "expectedSourceId": "get_current_time" },
+  { "query": "Systeminformationen anzeigen", "expectedSourceId": "get_system_info" },
+  { "query": "show system information", "expectedSourceId": "get_system_info" },
+  { "query": "Benutzerberechtigungen anzeigen", "expectedSourceId": "get_user_permissions" },
+  { "query": "show user permissions", "expectedSourceId": "get_user_permissions" },
+  { "query": "Planungsregel erstellen", "expectedSourceId": "create_scheduling_rule" },
+  { "query": "create scheduling rule", "expectedSourceId": "create_scheduling_rule" },
+  { "query": "Erinnerung hinzufügen", "expectedSourceId": "add_ai_memory" },
+  { "query": "add memory note", "expectedSourceId": "add_ai_memory" },
+  { "query": "Vertrag erstellen", "expectedSourceId": "create_contract" },
+  { "query": "create a contract", "expectedSourceId": "create_contract" }
+]
