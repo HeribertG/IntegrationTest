@@ -101,6 +101,39 @@ public class ExportLogRepositoryTests
     }
 
     [Test]
+    public async Task HasExportForPeriodAsync_GlobalExport_MatchesAnyGroupQuery()
+    {
+        var globalEntry = new ExportLog
+        {
+            Format = "csv",
+            StartDate = new DateOnly(2026, 6, 1),
+            EndDate = new DateOnly(2026, 6, 30),
+            GroupId = null,
+            FileName = "global.csv",
+            ExportedAt = DateTime.UtcNow,
+            ExportedBy = "integration-test"
+        };
+        var groupAEntry = new ExportLog
+        {
+            Format = "datev",
+            StartDate = new DateOnly(2026, 6, 1),
+            EndDate = new DateOnly(2026, 6, 30),
+            GroupId = Guid.NewGuid(),
+            FileName = "group-a.csv",
+            ExportedAt = DateTime.UtcNow,
+            ExportedBy = "integration-test"
+        };
+        await _repo.AddAsync(globalEntry);
+        await _repo.AddAsync(groupAEntry);
+        _insertedIds.Add(globalEntry.Id);
+        _insertedIds.Add(groupAEntry.Id);
+
+        var randomGroupId = Guid.NewGuid();
+        (await _repo.HasExportForPeriodAsync(new DateOnly(2026, 6, 10), new DateOnly(2026, 6, 15), randomGroupId)).Should().BeTrue();
+        (await _repo.HasExportForPeriodAsync(new DateOnly(2026, 6, 10), new DateOnly(2026, 6, 15), null)).Should().BeTrue();
+    }
+
+    [Test]
     public async Task HasExportForPeriodAsync_ReturnsFalse_WhenDisjoint()
     {
         var entry = new ExportLog

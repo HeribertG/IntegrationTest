@@ -2,7 +2,7 @@ using FluentAssertions;
 using Klacks.Api.Domain.Enums;
 using Klacks.Api.Domain.Models.Schedules;
 using Klacks.Api.Infrastructure.Persistence;
-using Klacks.Api.Infrastructure.Repositories.PeriodClosing;
+using Klacks.Api.Infrastructure.Repositories.Schedules;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using NSubstitute;
