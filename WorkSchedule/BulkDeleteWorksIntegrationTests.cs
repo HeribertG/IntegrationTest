@@ -76,7 +76,7 @@ public class BulkDeleteWorksIntegrationTests
         notificationFacade.GetConnectionId().Returns(string.Empty);
 
         var completionService = Substitute.For<IScheduleCompletionService>();
-        completionService.SaveBulkAndTrackAsync(Arg.Any<List<(Guid, DateOnly)>>())
+        completionService.SaveBulkAndTrackAsync(Arg.Any<List<(Guid ClientId, DateOnly CurrentDate, Guid? AnalyseToken)>>())
             .Returns(async callInfo => { await _context.SaveChangesAsync(); });
 
         _handler = new BulkDeleteWorksCommandHandler(

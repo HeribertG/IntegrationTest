@@ -121,7 +121,7 @@ public class BulkAddWorksIntegrationTests
         notificationFacade.GetConnectionId().Returns(string.Empty);
 
         var completionService = Substitute.For<IScheduleCompletionService>();
-        completionService.SaveBulkAndTrackAsync(Arg.Any<List<(Guid, DateOnly)>>())
+        completionService.SaveBulkAndTrackAsync(Arg.Any<List<(Guid ClientId, DateOnly CurrentDate, Guid? AnalyseToken)>>())
             .Returns(async callInfo => { await _context.SaveChangesAsync(); });
 
         _handler = new BulkAddWorksCommandHandler(
@@ -550,7 +550,7 @@ OUTPUT 1, Round(TotalBonus, 2)",
         notificationFacade.GetConnectionId().Returns(string.Empty);
 
         var completionService = Substitute.For<IScheduleCompletionService>();
-        completionService.SaveBulkAndTrackAsync(Arg.Any<List<(Guid, DateOnly)>>())
+        completionService.SaveBulkAndTrackAsync(Arg.Any<List<(Guid ClientId, DateOnly CurrentDate, Guid? AnalyseToken)>>())
             .Returns(async callInfo => { await _context.SaveChangesAsync(); });
 
         return new BulkAddWorksCommandHandler(

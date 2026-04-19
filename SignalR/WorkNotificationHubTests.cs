@@ -233,8 +233,8 @@ public class WorkNotificationHubTests
         var startDateStr = periodStart.ToString("yyyy-MM-dd");
         var endDateStr = periodEnd.ToString("yyyy-MM-dd");
 
-        await connection1.InvokeAsync("JoinScheduleGroup", startDateStr, endDateStr);
-        await connection2.InvokeAsync("JoinScheduleGroup", startDateStr, endDateStr);
+        await connection1.InvokeAsync("JoinScheduleGroup", startDateStr, endDateStr, (string?)null);
+        await connection2.InvokeAsync("JoinScheduleGroup", startDateStr, endDateStr, (string?)null);
 
         // Act
         var workRequest = new
@@ -309,8 +309,8 @@ public class WorkNotificationHubTests
         var startDateStr = periodStart.ToString("yyyy-MM-dd");
         var endDateStr = periodEnd.ToString("yyyy-MM-dd");
 
-        await connection1.InvokeAsync("JoinScheduleGroup", startDateStr, endDateStr);
-        await connection2.InvokeAsync("JoinScheduleGroup", startDateStr, endDateStr);
+        await connection1.InvokeAsync("JoinScheduleGroup", startDateStr, endDateStr, (string?)null);
+        await connection2.InvokeAsync("JoinScheduleGroup", startDateStr, endDateStr, (string?)null);
 
         // Act
         _httpClient.DefaultRequestHeaders.Remove("Authorization");
@@ -369,9 +369,9 @@ public class WorkNotificationHubTests
         var startDateStr = periodStart.ToString("yyyy-MM-dd");
         var endDateStr = periodEnd.ToString("yyyy-MM-dd");
 
-        await connection1.InvokeAsync("JoinScheduleGroup", startDateStr, endDateStr);
-        await connection2.InvokeAsync("JoinScheduleGroup", startDateStr, endDateStr);
-        await connection3.InvokeAsync("JoinScheduleGroup", startDateStr, endDateStr);
+        await connection1.InvokeAsync("JoinScheduleGroup", startDateStr, endDateStr, (string?)null);
+        await connection2.InvokeAsync("JoinScheduleGroup", startDateStr, endDateStr, (string?)null);
+        await connection3.InvokeAsync("JoinScheduleGroup", startDateStr, endDateStr, (string?)null);
 
         // Act
         var workRequest = new
