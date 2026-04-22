@@ -35,6 +35,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Klacks.Api\Klacks.Api.csproj" />
+		<ProjectReference Include="..\Klacks.ScheduleOptimizer\Klacks.ScheduleOptimizer.csproj" />
 	</ItemGroup>
 
 </Project>
