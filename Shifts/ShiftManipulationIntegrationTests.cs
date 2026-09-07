@@ -158,7 +158,9 @@ public class ShiftManipulationIntegrationTests
         // Create handlers
         var postHandlerLogger = Substitute.For<ILogger<PostCommandHandler>>();
         var defaultShiftMacroResolver = Substitute.For<IDefaultShiftMacroResolver>();
-        _postHandler = new PostCommandHandler(_shiftRepository, _scheduleMapper, _unitOfWork, defaultShiftMacroResolver, postHandlerLogger);
+        var orderSealingService = Substitute.For<IOrderSealingService>();
+        orderSealingService.CollectMissingRequirements(Arg.Any<Shift>()).Returns(Array.Empty<string>());
+        _postHandler = new PostCommandHandler(_shiftRepository, _scheduleMapper, _unitOfWork, defaultShiftMacroResolver, orderSealingService, postHandlerLogger);
 
         var putHandlerLogger = Substitute.For<ILogger<PutCommandHandler>>();
         _putHandler = new PutCommandHandler(_shiftRepository, _scheduleMapper, _unitOfWork, putHandlerLogger);
