@@ -300,6 +300,7 @@ public class ShiftManipulationIntegrationTests
     {
         // Arrange
         var shiftResource = CreateTestShiftResource("OriginalOrder_Test", ShiftStatus.OriginalOrder);
+        shiftResource.ClientId = _customerId;
         var command = new PostCommand<ShiftResource>(shiftResource);
 
         // Act
@@ -329,6 +330,7 @@ public class ShiftManipulationIntegrationTests
     {
         // Arrange - First create an OriginalOrder
         var originalOrderResource = CreateTestShiftResource("Seal_Test", ShiftStatus.OriginalOrder);
+        originalOrderResource.ClientId = _customerId;
         var createCommand = new PostCommand<ShiftResource>(originalOrderResource);
         var originalOrder = await _postHandler.Handle(createCommand, CancellationToken.None);
 
@@ -588,6 +590,7 @@ public class ShiftManipulationIntegrationTests
 
         // Arrange - create an OriginalOrder shift carrying 2 groups.
         var createResource = CreateTestShiftResource("GroupPreserve", ShiftStatus.OriginalOrder);
+        createResource.ClientId = _customerId;
         createResource.Groups = new List<SimpleGroupResource>
         {
             new() { Id = groupA },
