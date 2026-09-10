@@ -16,15 +16,15 @@
 /// The stored rows carry a single embedding space, and since the synchronizer is neutralized nothing
 /// realigns the vectors at runtime — so the "Active embedding space" line this test writes MUST match
 /// it. Any other value means the KNN pass compares vectors across incompatible spaces and every recall
-/// figure below is meaningless rather than merely weak. Since 2026-07-30 the expected id is
-/// "onnx:multilingual-e5-base@768" (was "-small@384", verified 2026-07-28 by recomputing the stored
+/// figure below is meaningless rather than merely weak. Since 2026-08-20 the expected id is
+/// "onnx:multilingual-e5-base-fp16@768" (KnowledgeIndexConstants.EmbeddingModelName; before that
+/// "-base@768" from 2026-07-30 and "-small@384" earlier, verified 2026-07-28 by recomputing the stored
 /// hashes in SQL).
 /// </summary>
 
 using System.Text.Json;
 using Klacks.Api.Application.Interfaces.Settings;
 using Klacks.Api.Domain.Interfaces.Assistant;
-using Klacks.Api.Domain.Models.Assistant;
 using Klacks.Api.KnowledgeIndex.Application.Constants;
 using Klacks.Api.KnowledgeIndex.Application.Interfaces;
 using Klacks.Api.KnowledgeIndex.Domain;
@@ -55,42 +55,10 @@ public class KnowledgeIndexHardGoldenSetDiHostTests
     private static readonly string OffTopicPath =
         Path.Combine(AppContext.BaseDirectory, "KnowledgeIndex", "knowledge-index-offtopic.json");
 
-    private sealed class NoOpUiControlRepository : IUiControlRepository
-    {
-        public Task<List<UiControl>> GetByPageKeyAsync(string pageKey, CancellationToken cancellationToken = default) =>
-            Task.FromResult(new List<UiControl>());
-
-        public Task<List<string>> GetDistinctPageKeysAsync(CancellationToken cancellationToken = default) =>
-            Task.FromResult(new List<string>());
-
-        public Task<List<UiControl>> GetAllAsync(CancellationToken cancellationToken = default) =>
-            Task.FromResult(new List<UiControl>());
-
-        public Task AddRangeAsync(IEnumerable<UiControl> controls, CancellationToken cancellationToken = default) =>
-            Task.CompletedTask;
-
-        public Task UpdateAsync(UiControl control, CancellationToken cancellationToken = default) =>
-            Task.CompletedTask;
-
-        public Task UpsertAsync(UiControl control, CancellationToken cancellationToken = default) =>
-            Task.CompletedTask;
-
-        public Task<int> GetCountAsync(CancellationToken cancellationToken = default) => Task.FromResult(0);
-    }
-
-    private sealed class NoOpRegionSetupService : IRegionSetupService
-    {
-        public Task ApplyAsync() => Task.CompletedTask;
-    }
-
-    // Prevents KnowledgeIndexStartupService (an IHostedService that runs unconditionally at boot)
-    // from calling the real synchronizer, which would upsert/delete rows in the shared dev DB's
-    // knowledge_index table under a different embedding space than the one already stored there.
-    private sealed class NoOpKnowledgeIndexSynchronizer : IKnowledgeIndexSynchronizer
-    {
-        public Task SyncAsync(CancellationToken cancellationToken) => Task.CompletedTask;
-    }
-
+    // The no-op services live in GoldenSetDiHostNoOps.cs; the synchronizer replacement prevents
+    // KnowledgeIndexStartupService (an IHostedService that runs unconditionally at boot) from
+    // upserting/deleting rows in the shared dev DB's knowledge_index table under a different
+    // embedding space than the one already stored there.
     private sealed class HardGoldenSetBypassFactory : SignalRTestWebApplicationFactory
     {
         protected override void ConfigureWebHost(IWebHostBuilder builder)
